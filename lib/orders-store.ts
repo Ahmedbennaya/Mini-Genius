@@ -15,6 +15,17 @@ import {
 
 const ROOT = process.cwd();
 const ORDERS_FILE = path.join(ROOT, "data", "orders.json");
+const ORDERS_KEY = process.env.ORDERS_STORAGE_KEY || "mini-genius:orders";
+
+type KvConfig = {
+  url: string;
+  token: string;
+};
+
+type KvResponse<T> = {
+  result?: T;
+  error?: string;
+};
 
 type LegacyOrder = Partial<Order> & {
   customer?: {
@@ -31,6 +42,60 @@ type LegacyOrder = Partial<Order> & {
 
 function pad(value: number) {
   return String(value).padStart(4, "0");
+}
+
+function getKvConfig(): KvConfig | null {
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (!url || !token) return null;
+  return { url: url.replace(/\/$/, ""), token };
+}
+
+function isVercelReadonlyRuntime() {
+  return process.env.VERCEL === "1";
+}
+
+async function kvCommand<T>(config: KvConfig, command: Array<string | number>): Promise<T> {
+  const response = await fetch(config.url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${config.token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(command),
+    cache: "no-store",
+  });
+
+  const payload = (await response.json()) as KvResponse<T>;
+
+  if (!response.ok || payload.error) {
+    throw new Error(payload.error || "Order storage request failed");
+  }
+
+  return payload.result as T;
+}
+
+async function readOrdersKv(config: KvConfig): Promise<LegacyOrder[]> {
+  const raw = await kvCommand<string | null>(config, ["GET", ORDERS_KEY]);
+  if (!raw) return [];
+
+  const parsed = JSON.parse(raw);
+  if (!Array.isArray(parsed)) {
+    throw new Error("Orders KV value must contain a JSON array");
+  }
+
+  return parsed as LegacyOrder[];
+}
+
+async function writeOrdersKv(config: KvConfig, orders: Order[]) {
+  await kvCommand<string>(config, ["SET", ORDERS_KEY, JSON.stringify(orders)]);
+}
+
+function missingProductionStorageError() {
+  return new Error(
+    "Order storage is not configured for production. Add KV_REST_API_URL and KV_REST_API_TOKEN on Vercel."
+  );
 }
 
 async function ensureOrdersFile() {
@@ -56,6 +121,27 @@ async function readOrdersFile(): Promise<LegacyOrder[]> {
 async function writeOrdersFile(orders: Order[]) {
   await ensureOrdersFile();
   await fs.writeFile(ORDERS_FILE, `${JSON.stringify(orders, null, 2)}\n`, "utf8");
+}
+
+async function readOrdersStorage(): Promise<LegacyOrder[]> {
+  const kv = getKvConfig();
+  if (kv) return readOrdersKv(kv);
+  if (isVercelReadonlyRuntime()) return [];
+  return readOrdersFile();
+}
+
+async function writeOrdersStorage(orders: Order[]) {
+  const kv = getKvConfig();
+  if (kv) {
+    await writeOrdersKv(kv, orders);
+    return;
+  }
+
+  if (isVercelReadonlyRuntime()) {
+    throw missingProductionStorageError();
+  }
+
+  await writeOrdersFile(orders);
 }
 
 function normalizeStatus(status: unknown): OrderStatus {
@@ -129,7 +215,7 @@ function nextReference(orders: Order[]) {
 }
 
 export async function getOrders(): Promise<Order[]> {
-  const orders = (await readOrdersFile()).map(normalizeOrder);
+  const orders = (await readOrdersStorage()).map(normalizeOrder);
   return orders.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
@@ -141,7 +227,7 @@ export async function getOrderById(id: string): Promise<Order | undefined> {
 }
 
 export async function createOrder(input: CreateOrderInput): Promise<Order> {
-  const orders = (await readOrdersFile()).map(normalizeOrder);
+  const orders = (await readOrdersStorage()).map(normalizeOrder);
   const now = new Date().toISOString();
   const order: Order = {
     id: randomUUID(),
@@ -164,7 +250,7 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
     paymentMethod: input.paymentMethod,
   };
 
-  await writeOrdersFile([order, ...orders]);
+  await writeOrdersStorage([order, ...orders]);
   return order;
 }
 
@@ -173,7 +259,7 @@ export async function updateOrderStatus(id: string, status: OrderStatus): Promis
 }
 
 export async function updateOrder(id: string, updates: Partial<Order>): Promise<Order> {
-  const orders = (await readOrdersFile()).map(normalizeOrder);
+  const orders = (await readOrdersStorage()).map(normalizeOrder);
   const index = orders.findIndex((order) => order.id === id || order.reference === id);
 
   if (index < 0) throw new Error("Order not found");
@@ -188,6 +274,6 @@ export async function updateOrder(id: string, updates: Partial<Order>): Promise<
   });
 
   orders[index] = updated;
-  await writeOrdersFile(orders);
+  await writeOrdersStorage(orders);
   return updated;
 }
