@@ -19,7 +19,7 @@ const COLS = [
     title: "Aide",
     links: [
       { label: "Livraison & paiement", href: "/a-propos#livraison" },
-      { label: "Politique de retour", href: "/a-propos#retours" },
+      { label: "Politique de retour", href: "/politique-retour" },
       { label: "Conseils par âge", href: "/collection?age=all" },
       { label: "FAQ", href: "/contact#faq" },
     ],
