@@ -1,0 +1,37 @@
+You are Claude Code. Import and use the product catalog file mini_genius_750_dropshipping_products.json for my Mini Genius kids educational toys ecommerce website.
+
+Goal:
+- Add these 750 product records to the website data layer.
+- Build/import data from JSON cleanly.
+- Create category pages, filters, product pages, search, related products, and collection pages.
+- Keep the UI premium, fast, mobile-first, French, Tunisia market, currency TND.
+- Do not use copyrighted Google images directly.
+- Use image_url_placeholder fields only as placeholders until I upload supplier-approved photos.
+- Use image_prompt fields to generate placeholder mockups if needed.
+- Use safety_note on product pages.
+- Use age_recommended and category filters in collection.
+- Highlight priority A products on homepage.
+
+Required:
+1. Create /data/products.ts or /data/products.json from the catalog.
+2. Create types/interfaces for Product.
+3. Ensure every product slug has a working product page.
+4. Create filter options from real category, subcategory, age, and price fields.
+5. Add WhatsApp order button to each product.
+6. Add SEO metadata using seo_title and seo_keywords.
+7. Add product cards with name_fr, price_tnd, compare_at_price_tnd, benefit, age_recommended, image.
+8. Add a safety/trust block on product detail pages.
+9. Do not break the current design.
+10. Run the site and fix all errors.
+
+JSON file contains 750 products across:
+- Montessori & Motricité
+- STEM & Construction
+- Sensoriel & Calme
+- Puzzles & Logique
+- Apprentissage Langue & Maths
+- Créatif & Art
+- Jeu d’Imitation
+- Plein Air & Sport
+- Bébé & Éveil
+- Coffrets Cadeaux

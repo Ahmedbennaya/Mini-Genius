@@ -1,0 +1,151 @@
+// Mini Genius — sample data
+
+const PRODUCTS = [
+  {
+    id: "puzzle-bois",
+    name: "Puzzle Montessori en Bois",
+    age: "2–4 ans",
+    price: 49,
+    rating: 4.9,
+    reviews: 128,
+    benefit: "Développe la motricité fine et la logique",
+    category: "montessori",
+    color: "var(--mint)",
+    accent: "var(--mint-deep)",
+    shape: "puzzle",
+    isNew: true,
+  },
+  {
+    id: "cubes-alphabet",
+    name: "Cubes Alphabet Français",
+    age: "3–6 ans",
+    price: 65,
+    rating: 4.8,
+    reviews: 94,
+    benefit: "Apprendre les lettres en s'amusant",
+    category: "montessori",
+    color: "var(--butter)",
+    accent: "var(--butter-deep)",
+    shape: "cube",
+  },
+  {
+    id: "blocs-magnetiques",
+    name: "Blocs Magnétiques Créatifs",
+    age: "4–8 ans",
+    price: 119,
+    rating: 4.9,
+    reviews: 211,
+    benefit: "Construire en 2D et 3D, infiniment",
+    category: "construction",
+    color: "var(--sky)",
+    accent: "var(--sky-deep)",
+    shape: "blocks",
+    bestseller: true,
+  },
+  {
+    id: "planche-sensorielle",
+    name: "Planche Sensorielle Bébé",
+    age: "1–3 ans",
+    price: 89,
+    rating: 4.7,
+    reviews: 67,
+    benefit: "Éveil sensoriel et coordination",
+    category: "sensoriel",
+    color: "var(--coral)",
+    accent: "var(--coral-deep)",
+    shape: "board",
+  },
+  {
+    id: "tri-couleurs",
+    name: "Jeu de Tri des Couleurs",
+    age: "2–5 ans",
+    price: 39,
+    rating: 4.8,
+    reviews: 156,
+    benefit: "Reconnaître les couleurs et compter",
+    category: "montessori",
+    color: "var(--lavender)",
+    accent: "var(--lavender-deep)",
+    shape: "balls",
+  },
+  {
+    id: "kit-stem",
+    name: "Kit Construction STEM",
+    age: "6–10 ans",
+    price: 149,
+    rating: 4.9,
+    reviews: 78,
+    benefit: "Mécanique, ingénierie, créativité",
+    category: "stem",
+    color: "var(--mint)",
+    accent: "var(--mint-deep)",
+    shape: "rocket",
+  },
+  {
+    id: "cartes-animaux",
+    name: "Cartes Éducatives Animaux",
+    age: "3–7 ans",
+    price: 29,
+    rating: 4.7,
+    reviews: 142,
+    benefit: "Découvrir les animaux du monde",
+    category: "puzzles",
+    color: "var(--butter)",
+    accent: "var(--butter-deep)",
+    shape: "cards",
+  },
+  {
+    id: "coffret-cadeau",
+    name: "Coffret Cadeau Montessori",
+    age: "2–6 ans",
+    price: 199,
+    rating: 5.0,
+    reviews: 53,
+    benefit: "5 jeux choisis avec soin, prêt à offrir",
+    category: "cadeaux",
+    color: "var(--coral)",
+    accent: "var(--coral-deep)",
+    shape: "gift",
+    bestseller: true,
+  },
+];
+
+const CATEGORIES = [
+  { id: "montessori", name: "Jouets Montessori", count: 32, color: "var(--mint)", accent: "var(--mint-deep)", shape: "ring" },
+  { id: "stem", name: "Jouets STEM", count: 18, color: "var(--sky)", accent: "var(--sky-deep)", shape: "rocket" },
+  { id: "sensoriel", name: "Jouets sensoriels", count: 24, color: "var(--coral)", accent: "var(--coral-deep)", shape: "board" },
+  { id: "puzzles", name: "Puzzles éducatifs", count: 27, color: "var(--butter)", accent: "var(--butter-deep)", shape: "puzzle" },
+  { id: "construction", name: "Jeux de construction", count: 21, color: "var(--lavender)", accent: "var(--lavender-deep)", shape: "blocks" },
+  { id: "cadeaux", name: "Cadeaux enfants", count: 14, color: "var(--coral)", accent: "var(--coral-deep)", shape: "gift" },
+];
+
+const AGES = [
+  { id: "1-2", label: "1–2 ans", desc: "Éveil sensoriel et premiers gestes", color: "var(--coral)", accent: "var(--coral-deep)", shape: "ball" },
+  { id: "3-5", label: "3–5 ans", desc: "Imagination et premiers apprentissages", color: "var(--butter)", accent: "var(--butter-deep)", shape: "cube" },
+  { id: "6-8", label: "6–8 ans", desc: "Logique, lecture, créativité", color: "var(--sky)", accent: "var(--sky-deep)", shape: "rocket" },
+  { id: "9+", label: "9+ ans", desc: "STEM, défis et grands projets", color: "var(--mint)", accent: "var(--mint-deep)", shape: "ring" },
+];
+
+const TESTIMONIALS = [
+  { name: "Yasmine B.", city: "Tunis", text: "Très belle qualité, mon fils adore les puzzles. La planche sensorielle est devenue son jouet préféré.", rating: 5, color: "var(--mint)" },
+  { name: "Mohamed S.", city: "Sfax", text: "Livraison rapide et jouets vraiment éducatifs. On voit que c'est sélectionné avec soin.", rating: 5, color: "var(--butter)" },
+  { name: "Amel K.", city: "Sousse", text: "Parfait pour offrir, le packaging est très joli. Ma nièce était ravie de son coffret cadeau.", rating: 5, color: "var(--coral)" },
+];
+
+const TRUST_BADGES = [
+  { icon: "truck", title: "Livraison partout en Tunisie", desc: "24–72h selon la région" },
+  { icon: "shield", title: "Jouets sélectionnés", desc: "Sûrs, éducatifs, testés" },
+  { icon: "wallet", title: "Paiement à la livraison", desc: "Vous payez à réception" },
+  { icon: "chat", title: "Support rapide", desc: "WhatsApp 7j/7" },
+  { icon: "gift", title: "Idées cadeaux par âge", desc: "Le cadeau parfait, garanti" },
+];
+
+const BENEFITS = [
+  { title: "Développe la logique", desc: "Des défis adaptés à chaque âge.", color: "var(--sky)" },
+  { title: "Améliore la concentration", desc: "Le jeu prolongé, sans écran.", color: "var(--mint)" },
+  { title: "Encourage la créativité", desc: "Des matériaux ouverts et inspirants.", color: "var(--butter)" },
+  { title: "Moins d'écrans", desc: "Plus de jeu, plus de présence.", color: "var(--coral)" },
+  { title: "Apprendre par le jeu", desc: "La meilleure façon d'apprendre.", color: "var(--lavender)" },
+];
+
+window.MG_DATA = { PRODUCTS, CATEGORIES, AGES, TESTIMONIALS, TRUST_BADGES, BENEFITS };

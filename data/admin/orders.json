@@ -1,0 +1,88 @@
+[
+  {
+    "reference": "MG-2026-0009",
+    "createdAt": "2026-04-22T14:02:00.000Z",
+    "status": "pending",
+    "paymentStatus": "cod",
+    "customer": {
+      "fullName": "Yasmine Ben Salem",
+      "phone": "+216 55 123 111",
+      "email": "yasmine@example.com",
+      "city": "Tunis",
+      "address": "Rue Lac 2, Tunis",
+      "notes": "Appeler avant livraison"
+    },
+    "delivery": "express",
+    "items": [
+      {
+        "id": "blocs-magnetiques",
+        "slug": "blocs-magnetiques-creatifs",
+        "name": "Blocs Magnetiques Creatifs",
+        "price": 119,
+        "qty": 1
+      },
+      {
+        "id": "cartes-animaux",
+        "slug": "cartes-educatives-animaux",
+        "name": "Cartes Educatives Animaux",
+        "price": 29,
+        "qty": 2
+      }
+    ],
+    "subtotal": 177,
+    "deliveryFee": 12,
+    "discount": 10,
+    "total": 179
+  },
+  {
+    "reference": "MG-2026-0008",
+    "createdAt": "2026-04-21T09:15:00.000Z",
+    "status": "delivered",
+    "paymentStatus": "paid",
+    "customer": {
+      "fullName": "Ahmed Trabelsi",
+      "phone": "+216 98 111 222",
+      "city": "Sfax",
+      "address": "Centre Ville, Sfax"
+    },
+    "delivery": "standard",
+    "items": [
+      {
+        "id": "puzzle-bois",
+        "slug": "puzzle-montessori-en-bois",
+        "name": "Puzzle Montessori en Bois",
+        "price": 49,
+        "qty": 2
+      }
+    ],
+    "subtotal": 98,
+    "deliveryFee": 7,
+    "total": 105
+  },
+  {
+    "reference": "MG-2026-0007",
+    "createdAt": "2026-04-19T19:40:00.000Z",
+    "status": "shipped",
+    "paymentStatus": "cod",
+    "customer": {
+      "fullName": "Nour Chatti",
+      "phone": "+216 21 777 888",
+      "email": "nour@example.com",
+      "city": "Sousse",
+      "address": "Khezama Est, Sousse"
+    },
+    "delivery": "standard",
+    "items": [
+      {
+        "id": "coffret-cadeau",
+        "slug": "coffret-cadeau-montessori",
+        "name": "Coffret Cadeau Montessori",
+        "price": 199,
+        "qty": 1
+      }
+    ],
+    "subtotal": 199,
+    "deliveryFee": 7,
+    "total": 206
+  }
+]
