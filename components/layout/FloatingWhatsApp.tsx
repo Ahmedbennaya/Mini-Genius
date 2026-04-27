@@ -2,14 +2,27 @@
 
 import { MessageCircle, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { createMetaEventId, trackMetaEvent } from "@/lib/meta-pixel";
 import { whatsappOrderLink } from "@/lib/utils";
 
 export default function FloatingWhatsApp() {
+  const trackContact = () => {
+    trackMetaEvent(
+      "Contact",
+      { content_name: "floating-whatsapp" },
+      {
+        eventId: createMetaEventId("Contact", "floating-whatsapp"),
+        sendToServer: true,
+      }
+    );
+  };
+
   return (
     <motion.a
       href={whatsappOrderLink()}
       target="_blank"
       rel="noopener"
+      onClick={trackContact}
       aria-label="Besoin d'aide ? Contactez-nous sur WhatsApp"
       title="Besoin d'aide ? Contactez-nous sur WhatsApp"
       initial={{ opacity: 0, y: 20 }}

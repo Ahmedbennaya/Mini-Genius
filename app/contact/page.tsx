@@ -16,13 +16,26 @@ import {
 } from "lucide-react";
 import Reveal from "@/components/motion/Reveal";
 import StaggerGroup, { StaggerItem } from "@/components/motion/StaggerGroup";
+import { createMetaEventId, trackMetaEvent } from "@/lib/meta-pixel";
 import { whatsappOrderLink } from "@/lib/utils";
 
 export default function ContactPage() {
   const [done, setDone] = useState(false);
 
+  const trackContact = (method: string) => {
+    trackMetaEvent(
+      "Contact",
+      { content_name: method },
+      {
+        eventId: createMetaEventId("Contact", method),
+        sendToServer: true,
+      }
+    );
+  };
+
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    trackContact("contact-form");
     setDone(true);
   };
 
@@ -80,6 +93,7 @@ export default function ContactPage() {
               href={whatsappOrderLink()}
               target="_blank"
               rel="noopener"
+              onClick={() => trackContact("whatsapp-contact-page")}
               className="btn-whatsapp btn-lg sm:flex-1"
             >
               <MessageCircle size={18} />
@@ -99,6 +113,7 @@ export default function ContactPage() {
               value="+216 00 000 000"
               href={whatsappOrderLink()}
               cta="Discuter sur WhatsApp"
+              onClick={() => trackContact("whatsapp-card")}
             />
           </StaggerItem>
           <StaggerItem>
@@ -108,6 +123,7 @@ export default function ContactPage() {
               value="+216 00 000 000"
               href="tel:+21600000000"
               cta="Appeler"
+              onClick={() => trackContact("phone-card")}
             />
           </StaggerItem>
           <StaggerItem>
@@ -116,6 +132,7 @@ export default function ContactPage() {
               title="Email"
               value="bonjour@minigenius.tn"
               href="mailto:bonjour@minigenius.tn"
+              onClick={() => trackContact("email-card")}
               cta="Écrire un email"
             />
           </StaggerItem>
@@ -200,18 +217,21 @@ function ContactCard({
   value,
   href,
   cta,
+  onClick,
 }: {
   icon: React.ReactNode;
   title: string;
   value: string;
   href: string;
   cta: string;
+  onClick?: () => void;
 }) {
   return (
     <a
       href={href}
       target={href.startsWith("http") ? "_blank" : undefined}
       rel="noopener"
+      onClick={onClick}
       className="group flex items-center justify-between gap-4 rounded-3xl border border-cream-300 bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-card"
     >
       <div className="flex items-center gap-3">

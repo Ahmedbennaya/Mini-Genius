@@ -1,0 +1,62 @@
+[
+  {
+    "id": "age-1-2",
+    "slug": "age-1-2",
+    "name": "1-2 ans",
+    "description": "Eveil sensoriel et premiers gestes",
+    "image": "/images/age-1-2.jpg",
+    "ageLabel": "1-2 ans",
+    "ageMin": 1,
+    "ageMax": 2,
+    "category": "all",
+    "active": true,
+    "sortOrder": 10,
+    "createdAt": "2026-04-27T00:00:00.000Z",
+    "updatedAt": "2026-04-27T00:00:00.000Z"
+  },
+  {
+    "id": "age-3-5",
+    "slug": "age-3-5",
+    "name": "3-5 ans",
+    "description": "Imagination et apprentissages",
+    "image": "/images/age-3-5.jpg",
+    "ageLabel": "3-5 ans",
+    "ageMin": 3,
+    "ageMax": 5,
+    "category": "all",
+    "active": true,
+    "sortOrder": 20,
+    "createdAt": "2026-04-27T00:00:00.000Z",
+    "updatedAt": "2026-04-27T00:00:00.000Z"
+  },
+  {
+    "id": "age-6-8",
+    "slug": "age-6-8",
+    "name": "6-8 ans",
+    "description": "Logique, lecture et creativite",
+    "image": "/images/age-6-8.jpg",
+    "ageLabel": "6-8 ans",
+    "ageMin": 6,
+    "ageMax": 8,
+    "category": "all",
+    "active": true,
+    "sortOrder": 30,
+    "createdAt": "2026-04-27T00:00:00.000Z",
+    "updatedAt": "2026-04-27T00:00:00.000Z"
+  },
+  {
+    "id": "age-9-plus",
+    "slug": "age-9-plus",
+    "name": "9+ ans",
+    "description": "STEM, defis et grands projets",
+    "image": "/images/age-9-plus.jpg",
+    "ageLabel": "9+ ans",
+    "ageMin": 9,
+    "ageMax": 99,
+    "category": "all",
+    "active": true,
+    "sortOrder": 40,
+    "createdAt": "2026-04-27T00:00:00.000Z",
+    "updatedAt": "2026-04-27T00:00:00.000Z"
+  }
+]

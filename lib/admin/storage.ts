@@ -7,8 +7,10 @@ import {
   updateOrderStatus as updateStoredOrderStatus,
 } from "@/lib/orders-store";
 import type {
+  AdminCollection,
   AdminOrder,
   AdminSettings,
+  CollectionInput,
   Coupon,
   CustomerSnapshot,
   MediaAsset,
@@ -19,9 +21,18 @@ const ROOT = process.cwd();
 const CATALOG_FILE = path.join(ROOT, "data", "catalog.json");
 const CATALOG_BACKUP_DIR = path.join(ROOT, "data", "backups");
 const ADMIN_DIR = path.join(ROOT, "data", "admin");
+const COLLECTIONS_FILE = path.join(ADMIN_DIR, "collections.json");
 const COUPONS_FILE = path.join(ADMIN_DIR, "coupons.json");
 const MEDIA_FILE = path.join(ADMIN_DIR, "media.json");
 const SETTINGS_FILE = path.join(ADMIN_DIR, "settings.json");
+const PRODUCT_CATEGORY_IDS = [
+  "montessori",
+  "stem",
+  "sensoriel",
+  "puzzles",
+  "construction",
+  "cadeaux",
+] as const;
 
 async function readJsonFile<T>(filePath: string, fallback: T): Promise<T> {
   try {
@@ -66,6 +77,109 @@ function safeId(input: string) {
     .replace(/^-+|-+$/g, "")
     .slice(0, 60);
 }
+
+function normalizeCollectionSlug(input: string) {
+  return safeId(input).replace(/-plus$/g, "-plus");
+}
+
+function ageLabel(min: number, max: number) {
+  if (max >= 99) return `${min}+ ans`;
+  if (min === max) return `${min} ans`;
+  return `${min}-${max} ans`;
+}
+
+function normalizeAge(value: unknown, fallback: number) {
+  const next = Number(value);
+  if (!Number.isFinite(next)) return fallback;
+  return Math.min(99, Math.max(0, Math.round(next)));
+}
+
+function normalizeCollection(input: CollectionInput | AdminCollection, existing?: AdminCollection): AdminCollection {
+  const now = new Date().toISOString();
+  const name = input.name?.trim();
+  if (!name) throw new Error("Collection name is required");
+
+  const slug = normalizeCollectionSlug(input.slug || existing?.slug || name);
+  if (!slug) throw new Error("Collection slug is required");
+
+  const rawMin = normalizeAge(input.ageMin, existing?.ageMin ?? 1);
+  const rawMax = normalizeAge(input.ageMax, existing?.ageMax ?? rawMin);
+  const ageMin = Math.min(rawMin, rawMax);
+  const ageMax = Math.max(rawMin, rawMax);
+  const rawCategory = input.category || existing?.category || "all";
+  const category = PRODUCT_CATEGORY_IDS.includes(rawCategory as (typeof PRODUCT_CATEGORY_IDS)[number])
+    ? rawCategory
+    : "all";
+
+  return {
+    id: safeId(input.id || existing?.id || slug),
+    slug,
+    name,
+    description: input.description?.trim() || existing?.description || "",
+    image: input.image?.trim() || existing?.image || "",
+    ageLabel: input.ageLabel?.trim() || ageLabel(ageMin, ageMax),
+    ageMin,
+    ageMax,
+    category,
+    active: input.active ?? existing?.active ?? true,
+    sortOrder: Number.isFinite(Number(input.sortOrder))
+      ? Number(input.sortOrder)
+      : existing?.sortOrder ?? 0,
+    createdAt: existing?.createdAt || now,
+    updatedAt: now,
+  };
+}
+
+const DEFAULT_COLLECTIONS: AdminCollection[] = [
+  normalizeCollection({
+    id: "age-1-2",
+    slug: "age-1-2",
+    name: "1-2 ans",
+    description: "Eveil sensoriel et premiers gestes",
+    image: "/images/age-1-2.jpg",
+    ageMin: 1,
+    ageMax: 2,
+    category: "all",
+    active: true,
+    sortOrder: 10,
+  }),
+  normalizeCollection({
+    id: "age-3-5",
+    slug: "age-3-5",
+    name: "3-5 ans",
+    description: "Imagination et apprentissages",
+    image: "/images/age-3-5.jpg",
+    ageMin: 3,
+    ageMax: 5,
+    category: "all",
+    active: true,
+    sortOrder: 20,
+  }),
+  normalizeCollection({
+    id: "age-6-8",
+    slug: "age-6-8",
+    name: "6-8 ans",
+    description: "Logique, lecture et creativite",
+    image: "/images/age-6-8.jpg",
+    ageMin: 6,
+    ageMax: 8,
+    category: "all",
+    active: true,
+    sortOrder: 30,
+  }),
+  normalizeCollection({
+    id: "age-9-plus",
+    slug: "age-9-plus",
+    name: "9+ ans",
+    description: "STEM, defis et grands projets",
+    image: "/images/age-9-plus.jpg",
+    ageMin: 9,
+    ageMax: 99,
+    category: "all",
+    active: true,
+    sortOrder: 40,
+  }),
+];
 
 export async function listProducts(): Promise<Product[]> {
   const products = await readJsonFile<Product[]>(CATALOG_FILE, []);
@@ -147,6 +261,57 @@ export async function replaceProducts(inputs: ProductInput[]): Promise<Product[]
 
   await writeCatalogProducts(next, "import");
   return next;
+}
+
+export async function listCollections(): Promise<AdminCollection[]> {
+  const collections = await readJsonFile<AdminCollection[]>(COLLECTIONS_FILE, DEFAULT_COLLECTIONS);
+  return collections
+    .map((collection) => normalizeCollection(collection, collection))
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
+}
+
+export async function getCollectionById(id: string): Promise<AdminCollection | undefined> {
+  const collections = await listCollections();
+  return collections.find((collection) => collection.id === id || collection.slug === id);
+}
+
+export async function createCollection(input: CollectionInput): Promise<AdminCollection> {
+  const collections = await listCollections();
+  const collection = normalizeCollection(input);
+
+  if (!collection.id) throw new Error("Invalid collection id");
+  if (collections.some((item) => item.id === collection.id)) {
+    throw new Error("Collection id already exists");
+  }
+  if (collections.some((item) => item.slug === collection.slug)) {
+    throw new Error("Collection slug already exists");
+  }
+
+  const next = [collection, ...collections];
+  await writeJsonFile(COLLECTIONS_FILE, next);
+  return collection;
+}
+
+export async function updateCollection(id: string, input: CollectionInput): Promise<AdminCollection> {
+  const collections = await listCollections();
+  const index = collections.findIndex((collection) => collection.id === id || collection.slug === id);
+  if (index < 0) throw new Error("Collection not found");
+
+  const updated = normalizeCollection(input, collections[index]);
+  if (collections.some((item) => item.id !== collections[index].id && item.slug === updated.slug)) {
+    throw new Error("Collection slug already exists");
+  }
+
+  collections[index] = updated;
+  await writeJsonFile(COLLECTIONS_FILE, collections);
+  return updated;
+}
+
+export async function deleteCollection(id: string): Promise<void> {
+  const collections = await listCollections();
+  const next = collections.filter((collection) => collection.id !== id && collection.slug !== id);
+  if (next.length === collections.length) throw new Error("Collection not found");
+  await writeJsonFile(COLLECTIONS_FILE, next);
 }
 
 export async function listOrders(): Promise<AdminOrder[]> {

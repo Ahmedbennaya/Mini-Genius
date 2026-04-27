@@ -130,6 +130,7 @@ export default async function AdminDashboardPage() {
           <AdminCard title="Actions rapides" icon={<Boxes size={18} />}>
             <div className="grid gap-2">
               <QuickAction href="/admin/products/new" label="Ajouter un produit" />
+              <QuickAction href="/admin/collections" label="Creer une collection" />
               <QuickAction href="/admin/media" label="Completer les images manquantes" />
               <QuickAction href="/admin/orders" label="Traiter les commandes" />
               <QuickAction href="/admin/settings" label="Regler livraison et contact" />

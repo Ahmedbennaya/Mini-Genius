@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Mail } from "lucide-react";
+import Logo from "@/components/layout/Logo";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#fffaf4] via-[#f8fafc] to-[#f5f7fb] px-4 py-12">
       <div className="mx-auto max-w-md rounded-3xl border border-slate-200 bg-white/95 p-7 shadow-2xl backdrop-blur">
         <div className="mb-7 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-rose-500">Mini Genius</p>
+          <Logo variant="admin" className="justify-center" />
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Admin Login</h1>
           <p className="mt-2 text-sm text-slate-500">Connectez-vous pour gerer la boutique.</p>
         </div>

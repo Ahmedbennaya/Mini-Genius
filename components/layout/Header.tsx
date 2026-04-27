@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Search, User, ShoppingBag, Menu, MessageCircle } from "lucide-react";
 import { NAV } from "@/data/site";
 import { useCart } from "@/lib/cart-context";
+import { createMetaEventId, trackMetaEvent } from "@/lib/meta-pixel";
 import { whatsappOrderLink } from "@/lib/utils";
 import Logo from "./Logo";
 import MobileMenu from "./MobileMenu";
@@ -13,6 +14,17 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { count } = useCart();
+
+  const trackContact = () => {
+    trackMetaEvent(
+      "Contact",
+      { content_name: "header-whatsapp" },
+      {
+        eventId: createMetaEventId("Contact", "header-whatsapp"),
+        sendToServer: true,
+      }
+    );
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -63,6 +75,7 @@ export default function Header() {
               href={whatsappOrderLink()}
               target="_blank"
               rel="noopener"
+              onClick={trackContact}
               aria-label="Besoin d'aide ? Contactez-nous sur WhatsApp"
               title="Besoin d'aide ? WhatsApp"
               className="hidden md:inline-flex btn-whatsapp btn-sm hover:-translate-y-0.5 active:scale-[0.98]"

@@ -3,6 +3,7 @@ import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
 import SiteChrome from "@/components/layout/SiteChrome";
+import MetaPixel from "@/components/analytics/MetaPixel";
 import { getSiteUrl } from "@/lib/site-url";
 
 const display = Bricolage_Grotesque({
@@ -73,6 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" className={`${display.variable} ${sans.variable}`}>
       <body className="font-sans">
+        <MetaPixel />
         <CartProvider>
           <SiteChrome>{children}</SiteChrome>
         </CartProvider>

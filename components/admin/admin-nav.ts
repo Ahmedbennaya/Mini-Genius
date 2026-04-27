@@ -22,7 +22,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Produits", href: "/admin/products", icon: Package },
   { label: "Commandes", href: "/admin/orders", icon: ShoppingCart },
-  { label: "Categories", href: "/admin/categories", icon: Tags },
+  { label: "Collections", href: "/admin/collections", icon: Tags },
   { label: "Clients", href: "/admin/customers", icon: Users },
   { label: "Coupons", href: "/admin/coupons", icon: TicketPercent },
   { label: "Medias", href: "/admin/media", icon: Image },

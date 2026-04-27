@@ -10,6 +10,11 @@ import { CATEGORIES, PALETTE_HEX } from "@/data/site";
 import ToyVisual from "@/components/ui/ToyVisual";
 import Stars from "@/components/ui/Stars";
 import { useCart } from "@/lib/cart-context";
+import {
+  buildMetaCatalogData,
+  createMetaEventId,
+  trackMetaEvent,
+} from "@/lib/meta-pixel";
 import { cn, formatTND } from "@/lib/utils";
 
 export default function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
@@ -34,8 +39,56 @@ export default function ProductCard({ product, index = 0 }: { product: Product; 
   const handleAdd = () => {
     if (!product.inStock) return;
     add(product, 1);
+    trackMetaEvent(
+      "AddToCart",
+      buildMetaCatalogData(
+        [
+          {
+            id: product.id,
+            name: product.name,
+            category: product.category,
+            price: product.price,
+            qty: 1,
+          },
+        ],
+        product.price,
+        { contentName: product.name, contentCategory: product.category }
+      ),
+      {
+        eventId: createMetaEventId("AddToCart", product.id),
+        sendToServer: true,
+      }
+    );
     setAdded(true);
     setTimeout(() => setAdded(false), 1400);
+  };
+
+  const handleFavorite = () => {
+    const nextFavorite = !favorite;
+    setFavorite(nextFavorite);
+
+    if (!nextFavorite) return;
+
+    trackMetaEvent(
+      "AddToWishlist",
+      buildMetaCatalogData(
+        [
+          {
+            id: product.id,
+            name: product.name,
+            category: product.category,
+            price: product.price,
+            qty: 1,
+          },
+        ],
+        product.price,
+        { contentName: product.name, contentCategory: product.category }
+      ),
+      {
+        eventId: createMetaEventId("AddToWishlist", product.id),
+        sendToServer: true,
+      }
+    );
   };
 
   return (
@@ -121,7 +174,7 @@ export default function ProductCard({ product, index = 0 }: { product: Product; 
         <div className="absolute right-3 top-3 flex flex-col gap-2">
           <button
             type="button"
-            onClick={() => setFavorite((value) => !value)}
+            onClick={handleFavorite}
             className={cn(
               "inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/90 text-ink shadow-soft backdrop-blur transition hover:-translate-y-0.5 hover:bg-white",
               favorite && "text-coral-deep"

@@ -3,17 +3,22 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Filter, X, Search } from "lucide-react";
-import { CATEGORIES, AGES } from "@/data/site";
+import { Filter, Search, X } from "lucide-react";
+import { AGES, CATEGORIES } from "@/data/site";
+import type { AdminCollection } from "@/lib/admin/types";
 
 const SORTS = [
-  { value: "popular", label: "Popularité" },
-  { value: "new", label: "Nouveautés" },
+  { value: "popular", label: "Popularite" },
+  { value: "new", label: "Nouveautes" },
   { value: "price-asc", label: "Prix croissant" },
-  { value: "price-desc", label: "Prix décroissant" },
+  { value: "price-desc", label: "Prix decroissant" },
 ];
 
-export default function FilterSidebar() {
+type FilterSidebarProps = {
+  collections?: AdminCollection[];
+};
+
+export default function FilterSidebar({ collections = [] }: FilterSidebarProps) {
   const router = useRouter();
   const sp = useSearchParams();
   const searchParams = sp ?? new URLSearchParams();
@@ -22,22 +27,32 @@ export default function FilterSidebar() {
 
   const cat = searchParams.get("cat") ?? "all";
   const age = searchParams.get("age") ?? "all";
+  const collection = searchParams.get("collection") ?? "all";
   const sort = searchParams.get("sort") ?? "popular";
   const q = searchParams.get("q") ?? "";
   const max = Number(searchParams.get("max") ?? 250);
 
   const update = (patch: Record<string, string | number | undefined>) => {
     const params = new URLSearchParams(searchParams.toString());
-    Object.entries(patch).forEach(([k, v]) => {
-      if (v === undefined || v === "" || v === "all") params.delete(k);
-      else params.set(k, String(v));
+    Object.entries(patch).forEach(([key, value]) => {
+      if (value === undefined || value === "" || value === "all") params.delete(key);
+      else params.set(key, String(value));
     });
-    router.push(`/collection?${params.toString()}`, { scroll: false });
+
+    if ("collection" in patch && patch.collection && patch.collection !== "all") {
+      params.delete("cat");
+      params.delete("age");
+    }
+    if ("cat" in patch || "age" in patch) {
+      params.delete("collection");
+    }
+
+    const query = params.toString();
+    router.push(query ? `/collection?${query}` : "/collection", { scroll: false });
   };
 
   return (
     <>
-      {/* Mobile trigger */}
       <button
         className="btn-ghost lg:hidden"
         onClick={() => setOpen(true)}
@@ -47,9 +62,10 @@ export default function FilterSidebar() {
         Filtres
       </button>
 
-      {/* Desktop sidebar */}
       <aside className="hidden lg:block">
         <FilterContent
+          collections={collections}
+          collection={collection}
           cat={cat}
           age={age}
           sort={sort}
@@ -59,7 +75,6 @@ export default function FilterSidebar() {
         />
       </aside>
 
-      {/* Mobile drawer */}
       <AnimatePresence>
         {open && (
           <>
@@ -88,6 +103,8 @@ export default function FilterSidebar() {
                 </button>
               </div>
               <FilterContent
+                collections={collections}
+                collection={collection}
                 cat={cat}
                 age={age}
                 sort={sort}
@@ -97,7 +114,7 @@ export default function FilterSidebar() {
               />
               <div className="sticky bottom-0 -mx-5 mt-5 border-t border-cream-300 bg-cream p-5">
                 <button onClick={() => setOpen(false)} className="btn-coral w-full">
-                  Voir les résultats
+                  Voir les resultats
                 </button>
               </div>
             </motion.div>
@@ -109,6 +126,8 @@ export default function FilterSidebar() {
 }
 
 function FilterContent({
+  collections,
+  collection,
   cat,
   age,
   sort,
@@ -116,6 +135,8 @@ function FilterContent({
   max,
   onChange,
 }: {
+  collections: AdminCollection[];
+  collection: string;
   cat: string;
   age: string;
   sort: string;
@@ -131,8 +152,8 @@ function FilterContent({
     <div className="space-y-7">
       <Section title="Recherche">
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
+          onSubmit={(event) => {
+            event.preventDefault();
             onChange({ q: search });
           }}
           className="relative"
@@ -140,63 +161,86 @@ function FilterContent({
           <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-mute" />
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(event) => setSearch(event.target.value)}
             placeholder="Rechercher..."
             className="input pl-11"
           />
         </form>
       </Section>
 
+      {collections.length > 0 ? (
+        <Section title="Collections">
+          <ul className="space-y-1.5">
+            <li>
+              <RadioRow
+                checked={collection === "all"}
+                onClick={() => onChange({ collection: "all" })}
+                label="Toutes les collections"
+              />
+            </li>
+            {collections.map((item) => (
+              <li key={item.id}>
+                <RadioRow
+                  checked={collection === item.slug}
+                  onClick={() => onChange({ collection: item.slug })}
+                  label={`${item.name} (${item.ageLabel})`}
+                />
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ) : null}
+
       <Section title="Trier par">
         <ul className="space-y-1.5">
-          {SORTS.map((s) => (
-            <li key={s.value}>
+          {SORTS.map((item) => (
+            <li key={item.value}>
               <RadioRow
-                checked={sort === s.value}
-                onClick={() => onChange({ sort: s.value })}
-                label={s.label}
+                checked={sort === item.value}
+                onClick={() => onChange({ sort: item.value })}
+                label={item.label}
               />
             </li>
           ))}
         </ul>
       </Section>
 
-      <Section title="Âge">
+      <Section title="Age">
         <ul className="space-y-1.5">
           <li>
             <RadioRow
-              checked={age === "all"}
+              checked={age === "all" && collection === "all"}
               onClick={() => onChange({ age: "all" })}
-              label="Tous les âges"
+              label="Tous les ages"
             />
           </li>
-          {AGES.map((a) => (
-            <li key={a.id}>
+          {AGES.map((item) => (
+            <li key={item.id}>
               <RadioRow
-                checked={age === a.id}
-                onClick={() => onChange({ age: a.id })}
-                label={a.label}
+                checked={age === item.id && collection === "all"}
+                onClick={() => onChange({ age: item.id })}
+                label={item.label}
               />
             </li>
           ))}
         </ul>
       </Section>
 
-      <Section title="Catégorie">
+      <Section title="Categorie">
         <ul className="space-y-1.5">
           <li>
             <RadioRow
-              checked={cat === "all"}
+              checked={cat === "all" && collection === "all"}
               onClick={() => onChange({ cat: "all" })}
-              label="Toutes les catégories"
+              label="Toutes les categories"
             />
           </li>
-          {CATEGORIES.map((c) => (
-            <li key={c.id}>
+          {CATEGORIES.map((item) => (
+            <li key={item.id}>
               <RadioRow
-                checked={cat === c.id}
-                onClick={() => onChange({ cat: c.id })}
-                label={c.name}
+                checked={cat === item.id && collection === "all"}
+                onClick={() => onChange({ cat: item.id })}
+                label={item.name}
               />
             </li>
           ))}
@@ -210,16 +254,18 @@ function FilterContent({
           max={250}
           step={10}
           value={max}
-          onChange={(e) => onChange({ max: Number(e.target.value) })}
+          onChange={(event) => onChange({ max: Number(event.target.value) })}
           className="w-full accent-coral-deep"
         />
       </Section>
 
       <button
-        onClick={() => onChange({ cat: "all", age: "all", sort: "popular", q: "", max: 250 })}
+        onClick={() =>
+          onChange({ collection: "all", cat: "all", age: "all", sort: "popular", q: "", max: 250 })
+        }
         className="text-sm font-semibold text-coral-deep hover:underline"
       >
-        Réinitialiser les filtres
+        Reinitialiser les filtres
       </button>
     </div>
   );
@@ -249,12 +295,12 @@ function RadioRow({
     <button
       onClick={onClick}
       className={`flex w-full items-center justify-between rounded-2xl px-3 py-2.5 text-left text-[15px] transition ${
-        checked ? "bg-white shadow-soft text-ink font-semibold" : "text-ink-soft hover:bg-cream-200"
+        checked ? "bg-white font-semibold text-ink shadow-soft" : "text-ink-soft hover:bg-cream-200"
       }`}
     >
       <span>{label}</span>
       <span
-        className={`inline-block h-4 w-4 rounded-full border ${
+        className={`inline-block h-4 w-4 shrink-0 rounded-full border ${
           checked ? "border-coral-deep bg-coral-deep" : "border-cream-300"
         }`}
       />

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createOrder } from "@/lib/orders-store";
+import { sendMetaPurchaseEvent } from "@/lib/meta-conversions";
 import {
   isDeliveryMethod,
   isPaymentMethod,
@@ -34,6 +35,11 @@ export async function POST(req: Request) {
   try {
     const body = (await req.json()) as Partial<CreateOrderInput> & {
       fullName?: string;
+      meta?: {
+        fbp?: string;
+        fbc?: string;
+        eventSourceUrl?: string;
+      };
     };
 
     const customerName = clean(body.customerName || body.fullName);
@@ -79,6 +85,16 @@ export async function POST(req: Request) {
       paymentMethod,
       status: "new",
     });
+
+    try {
+      await sendMetaPurchaseEvent(req, order, {
+        fbp: clean(body.meta?.fbp),
+        fbc: clean(body.meta?.fbc),
+        eventSourceUrl: clean(body.meta?.eventSourceUrl),
+      });
+    } catch (error) {
+      console.error("Meta Purchase event failed", error);
+    }
 
     return NextResponse.json({ ok: true, data: order }, { status: 201 });
   } catch (error) {

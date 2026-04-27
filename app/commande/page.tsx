@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Check,
@@ -28,6 +28,12 @@ import {
   type PaymentMethod,
   type Order,
 } from "@/lib/orders";
+import {
+  buildMetaCatalogData,
+  createMetaEventId,
+  getMetaEventContext,
+  trackMetaEvent,
+} from "@/lib/meta-pixel";
 
 type FormState = {
   fullName: string;
@@ -53,6 +59,7 @@ const INITIAL: FormState = {
 
 export default function CheckoutPage() {
   const { lines, clear } = useCart();
+  const checkoutTrackedRef = useRef(false);
 
   const items = useMemo(
     () =>
@@ -76,6 +83,31 @@ export default function CheckoutPage() {
   const deliveryDef =
     DELIVERY_OPTIONS.find((d) => d.id === form.delivery) ?? DELIVERY_OPTIONS[0];
   const total = subtotal + deliveryDef.fee;
+  const metaItems = useMemo(
+    () =>
+      items.map((it) => ({
+        id: it.product.id,
+        name: it.product.name,
+        category: it.product.category,
+        price: it.product.price,
+        qty: it.qty,
+      })),
+    [items]
+  );
+
+  useEffect(() => {
+    if (checkoutTrackedRef.current || metaItems.length === 0) return;
+    checkoutTrackedRef.current = true;
+
+    trackMetaEvent(
+      "InitiateCheckout",
+      buildMetaCatalogData(metaItems, total),
+      {
+        eventId: createMetaEventId("InitiateCheckout", "cart"),
+        sendToServer: true,
+      }
+    );
+  }, [metaItems, total]);
 
   function setField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -133,6 +165,7 @@ export default function CheckoutPage() {
       deliveryFee: deliveryDef.fee,
       total,
       paymentMethod: form.paymentMethod,
+      meta: getMetaEventContext(),
     };
 
     try {
@@ -147,8 +180,22 @@ export default function CheckoutPage() {
         throw new Error(result.message || "Commande impossible pour le moment.");
       }
 
-      clear();
       const order = result.data;
+      trackMetaEvent(
+        "Purchase",
+        buildMetaCatalogData(
+          order.items.map((item) => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            qty: item.qty,
+          })),
+          order.total,
+          { orderId: order.reference }
+        ),
+        { eventId: order.reference, sendToServer: false }
+      );
+      clear();
       setConfirmedOrder(order);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {

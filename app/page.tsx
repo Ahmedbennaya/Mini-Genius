@@ -10,8 +10,13 @@ import Testimonials from "@/components/home/Testimonials";
 import GiftBoxSection from "@/components/home/GiftBoxSection";
 import FAQ from "@/components/home/FAQ";
 import Reveal from "@/components/motion/Reveal";
+import { listCollections } from "@/lib/admin/storage";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const collections = await listCollections();
+
   return (
     <>
       <Hero />
@@ -19,7 +24,7 @@ export default function HomePage() {
         <TrustBadges />
       </Reveal>
       <Reveal>
-        <AgeCategories />
+        <AgeCategories collections={collections.filter((collection) => collection.active)} />
       </Reveal>
       <Reveal variant="scaleIn">
         <Scroll3DShowcase />

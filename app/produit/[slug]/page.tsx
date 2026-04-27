@@ -6,6 +6,7 @@ import { PRODUCTS, getPrimaryProductImage, getProduct, getRelated } from "@/data
 import ProductImageGallery from "@/components/product/ProductImageGallery";
 import AddToCartActions from "@/components/product/AddToCartActions";
 import ProductCard from "@/components/product/ProductCard";
+import ProductViewTracker from "@/components/analytics/ProductViewTracker";
 import Stars from "@/components/ui/Stars";
 import { formatTND } from "@/lib/utils";
 import { CATEGORIES } from "@/data/site";
@@ -42,6 +43,8 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
 
   return (
     <div className="container-mg py-10 sm:py-14">
+      <ProductViewTracker product={product} />
+
       {/* Breadcrumb */}
       <Reveal
         as="nav"

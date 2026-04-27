@@ -9,6 +9,7 @@ dist
 *.tsbuildinfo
 data/backups/
 data/orders.json
+.claude/
 .DS_Store
 
 .vercel

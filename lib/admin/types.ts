@@ -44,6 +44,26 @@ export type AdminSettings = {
   updatedAt: string;
 };
 
+export type AdminCollection = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  image: string;
+  ageLabel: string;
+  ageMin: number;
+  ageMax: number;
+  category: Product["category"] | "all";
+  active: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CollectionInput = Partial<Omit<AdminCollection, "createdAt" | "updatedAt">> & {
+  name: string;
+};
+
 export type ProductInput = Omit<Product, "id"> & { id?: string };
 
 export type CustomerSnapshot = {

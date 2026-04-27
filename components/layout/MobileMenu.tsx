@@ -1,16 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Search, MessageCircle, ShoppingBag, User, ChevronRight } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { NAV } from "@/data/site";
+import { createMetaEventId, trackMetaEvent } from "@/lib/meta-pixel";
 import { whatsappOrderLink } from "@/lib/utils";
 import Logo from "./Logo";
 
 type Props = { open: boolean; onClose: () => void };
 
 export default function MobileMenu({ open, onClose }: Props) {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -19,6 +24,25 @@ export default function MobileMenu({ open, onClose }: Props) {
       };
     }
   }, [open]);
+
+  const trackContact = () => {
+    trackMetaEvent(
+      "Contact",
+      { content_name: "mobile-whatsapp" },
+      {
+        eventId: createMetaEventId("Contact", "mobile-whatsapp"),
+        sendToServer: true,
+      }
+    );
+  };
+
+  const submitSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    router.push(`/collection?q=${encodeURIComponent(trimmed)}`);
+    onClose();
+  };
 
   return (
     <AnimatePresence>
@@ -50,15 +74,17 @@ export default function MobileMenu({ open, onClose }: Props) {
             </div>
 
             <div className="px-5 pt-5">
-              <label className="relative block">
+              <form onSubmit={submitSearch} className="relative block">
                 <span className="sr-only">Rechercher</span>
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-mute" />
                 <input
                   type="search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
                   placeholder="Rechercher un jouet…"
                   className="input pl-11"
                 />
-              </label>
+              </form>
             </div>
 
             <nav className="flex-1 overflow-y-auto px-3 py-4">
@@ -84,6 +110,7 @@ export default function MobileMenu({ open, onClose }: Props) {
                 className="btn-whatsapp w-full"
                 target="_blank"
                 rel="noopener"
+                onClick={trackContact}
               >
                 <MessageCircle size={18} />
                 Besoin d&apos;aide&nbsp;? WhatsApp

@@ -24,6 +24,7 @@ export default function AdminShell({ children, adminEmail }: AdminShellProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loadingLogout, setLoadingLogout] = useState(false);
+  const currentPath = pathname ?? "";
 
   const adminName = useMemo(() => {
     const local = adminEmail.split("@")[0] || "admin";
@@ -63,7 +64,7 @@ export default function AdminShell({ children, adminEmail }: AdminShellProps) {
           <nav className="space-y-1">
             {ADMIN_NAV.map((item) => {
               const Icon = item.icon;
-              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const active = currentPath === item.href || currentPath.startsWith(`${item.href}/`);
               return (
                 <Link
                   key={item.href}

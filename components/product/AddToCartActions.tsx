@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ShoppingBag, CreditCard, Check } from "lucide-react";
 import type { Product } from "@/data/products";
 import { useCart } from "@/lib/cart-context";
+import { buildMetaCatalogData, createMetaEventId, trackMetaEvent } from "@/lib/meta-pixel";
 import QuantitySelector from "./QuantitySelector";
 
 export default function AddToCartActions({ product }: { product: Product }) {
@@ -13,14 +14,39 @@ export default function AddToCartActions({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
+  const trackAddToCart = () => {
+    trackMetaEvent(
+      "AddToCart",
+      buildMetaCatalogData(
+        [
+          {
+            id: product.id,
+            name: product.name,
+            category: product.category,
+            price: product.price,
+            qty,
+          },
+        ],
+        product.price * qty,
+        { contentName: product.name, contentCategory: product.category }
+      ),
+      {
+        eventId: createMetaEventId("AddToCart", product.id),
+        sendToServer: true,
+      }
+    );
+  };
+
   const handleAdd = () => {
     add(product, qty);
+    trackAddToCart();
     setAdded(true);
     setTimeout(() => setAdded(false), 1600);
   };
 
   const handleBuyNow = () => {
     add(product, qty);
+    trackAddToCart();
     router.push("/commande");
   };
 
