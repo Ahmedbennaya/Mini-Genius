@@ -5,6 +5,8 @@ import { CATEGORIES } from "@/data/site";
 import { formatTND } from "@/lib/utils";
 import { listOrders, listProducts } from "@/lib/admin/storage";
 
+export const dynamic = "force-dynamic";
+
 export default async function AnalyticsPage() {
   const [orders, products] = await Promise.all([listOrders(), listProducts()]);
   const revenue = orders.reduce((sum, order) => sum + order.total, 0);

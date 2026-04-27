@@ -24,8 +24,8 @@ import ToyVisual from "@/components/ui/ToyVisual";
 import { formatTND } from "@/lib/utils";
 import {
   DELIVERY_OPTIONS,
-  generateOrderReference,
-  saveOrder,
+  PAYMENT_METHODS,
+  type PaymentMethod,
   type Order,
 } from "@/lib/orders";
 
@@ -37,6 +37,7 @@ type FormState = {
   address: string;
   notes: string;
   delivery: "standard" | "express";
+  paymentMethod: PaymentMethod;
 };
 
 const INITIAL: FormState = {
@@ -47,6 +48,7 @@ const INITIAL: FormState = {
   address: "",
   notes: "",
   delivery: "standard",
+  paymentMethod: "cod",
 };
 
 export default function CheckoutPage() {
@@ -68,6 +70,7 @@ export default function CheckoutPage() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
 
   const deliveryDef =
@@ -77,6 +80,7 @@ export default function CheckoutPage() {
   function setField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
     setErrors((e) => ({ ...e, [key]: undefined }));
+    setSubmitError(null);
   }
 
   function validate(): boolean {
@@ -87,6 +91,7 @@ export default function CheckoutPage() {
       next.phone = "Numéro de téléphone invalide.";
     if (!form.city.trim()) next.city = "La ville est requise.";
     if (!form.address.trim()) next.address = "L'adresse complète est requise.";
+    if (!form.paymentMethod) next.paymentMethod = "Le mode de paiement est requis.";
     // Email is OPTIONAL — only validate format if provided.
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
       next.email = "Email invalide.";
@@ -107,18 +112,15 @@ export default function CheckoutPage() {
     }
 
     setSubmitting(true);
-    const reference = generateOrderReference();
-    const order: Order = {
-      reference,
-      createdAt: new Date().toISOString(),
-      customer: {
-        fullName: form.fullName.trim(),
-        phone: form.phone.trim(),
-        email: form.email.trim() || undefined,
-        city: form.city.trim(),
-        address: form.address.trim(),
-        notes: form.notes.trim() || undefined,
-      },
+    setSubmitError(null);
+
+    const payload = {
+      customerName: form.fullName.trim(),
+      phone: form.phone.trim(),
+      email: form.email.trim() || undefined,
+      city: form.city.trim(),
+      address: form.address.trim(),
+      notes: form.notes.trim() || undefined,
       delivery: form.delivery,
       items: items.map((it) => ({
         id: it.product.id,
@@ -130,16 +132,30 @@ export default function CheckoutPage() {
       subtotal,
       deliveryFee: deliveryDef.fee,
       total,
+      paymentMethod: form.paymentMethod,
     };
 
-    saveOrder(order);
-    clear();
-    // brief delay so the user sees the button state change
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = (await response.json()) as { ok?: boolean; data?: Order; message?: string };
+
+      if (!response.ok || !result.ok || !result.data) {
+        throw new Error(result.message || "Commande impossible pour le moment.");
+      }
+
+      clear();
+      const order = result.data;
       setConfirmedOrder(order);
-      setSubmitting(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 350);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Commande impossible pour le moment.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (confirmedOrder) {
@@ -313,7 +329,53 @@ export default function CheckoutPage() {
             })}
           </div>
 
+          <h3 className="mt-9 font-display text-lg font-semibold">Mode de paiement</h3>
+          <div className="mt-3 grid gap-3">
+            {PAYMENT_METHODS.slice(0, 1).map((method) => {
+              const active = form.paymentMethod === method.id;
+              return (
+                <label
+                  key={method.id}
+                  className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${
+                    active
+                      ? "border-coral-deep bg-coral/10 shadow-soft"
+                      : "border-cream-300 bg-white hover:border-ink/20"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value={method.id}
+                    checked={active}
+                    onChange={() => setField("paymentMethod", method.id)}
+                    className="sr-only"
+                    required
+                  />
+                  <span
+                    className={`mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+                      active ? "border-coral-deep bg-coral-deep" : "border-cream-300"
+                    }`}
+                  >
+                    {active && <Check size={12} className="text-white" />}
+                  </span>
+                  <span>
+                    <span className="font-semibold text-ink">{method.label}</span>
+                    <span className="block text-sm text-ink-soft">{method.desc}</span>
+                  </span>
+                </label>
+              );
+            })}
+            {errors.paymentMethod ? (
+              <p className="text-sm text-coral-deep">{errors.paymentMethod}</p>
+            ) : null}
+          </div>
+
           <div className="mt-9 flex flex-col gap-3">
+            {submitError ? (
+              <p className="rounded-2xl border border-coral-deep/20 bg-coral/10 px-4 py-3 text-sm font-semibold text-coral-deep">
+                {submitError}
+              </p>
+            ) : null}
             <button
               type="submit"
               disabled={submitting}
@@ -486,10 +548,10 @@ function OrderConfirmation({ order }: { order: Order }) {
 
           <div className="mt-8 grid gap-4 text-left sm:grid-cols-2">
             <SummaryBlock title="Livraison">
-              <p className="font-semibold">{order.customer.fullName}</p>
-              <p>{order.customer.phone}</p>
-              <p>{order.customer.address}</p>
-              <p>{order.customer.city}</p>
+              <p className="font-semibold">{order.customerName}</p>
+              <p>{order.phone}</p>
+              <p>{order.address}</p>
+              <p>{order.city}</p>
             </SummaryBlock>
             <SummaryBlock title="Total">
               <p className="font-display text-2xl font-semibold">{formatTND(order.total)}</p>

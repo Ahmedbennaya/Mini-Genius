@@ -1,6 +1,11 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { normalizeProduct, normalizeProducts, type Product } from "@/data/products";
+import {
+  getOrderById as getStoredOrderById,
+  getOrders as getStoredOrders,
+  updateOrderStatus as updateStoredOrderStatus,
+} from "@/lib/orders-store";
 import type {
   AdminOrder,
   AdminSettings,
@@ -14,7 +19,6 @@ const ROOT = process.cwd();
 const CATALOG_FILE = path.join(ROOT, "data", "catalog.json");
 const CATALOG_BACKUP_DIR = path.join(ROOT, "data", "backups");
 const ADMIN_DIR = path.join(ROOT, "data", "admin");
-const ORDERS_FILE = path.join(ADMIN_DIR, "orders.json");
 const COUPONS_FILE = path.join(ADMIN_DIR, "coupons.json");
 const MEDIA_FILE = path.join(ADMIN_DIR, "media.json");
 const SETTINGS_FILE = path.join(ADMIN_DIR, "settings.json");
@@ -146,25 +150,18 @@ export async function replaceProducts(inputs: ProductInput[]): Promise<Product[]
 }
 
 export async function listOrders(): Promise<AdminOrder[]> {
-  return readJsonFile<AdminOrder[]>(ORDERS_FILE, []);
+  return getStoredOrders();
 }
 
-export async function getOrder(reference: string): Promise<AdminOrder | undefined> {
-  const orders = await listOrders();
-  return orders.find((o) => o.reference === reference);
+export async function getOrder(id: string): Promise<AdminOrder | undefined> {
+  return getStoredOrderById(id);
 }
 
 export async function updateOrderStatus(
-  reference: string,
+  id: string,
   status: AdminOrder["status"]
 ): Promise<AdminOrder> {
-  const orders = await listOrders();
-  const index = orders.findIndex((o) => o.reference === reference);
-  if (index < 0) throw new Error("Order not found");
-  const updated = { ...orders[index], status };
-  orders[index] = updated;
-  await writeJsonFile(ORDERS_FILE, orders);
-  return updated;
+  return updateStoredOrderStatus(id, status);
 }
 
 export async function listCoupons(): Promise<Coupon[]> {
@@ -230,16 +227,16 @@ export function customersFromOrders(orders: AdminOrder[]): CustomerSnapshot[] {
   const map = new Map<string, CustomerSnapshot>();
 
   for (const order of orders) {
-    const key = (order.customer.email || order.customer.phone).toLowerCase();
+    const key = (order.email || order.phone).toLowerCase();
     const prev = map.get(key);
 
     if (!prev) {
       map.set(key, {
         id: key,
-        fullName: order.customer.fullName,
-        phone: order.customer.phone,
-        email: order.customer.email,
-        city: order.customer.city,
+        fullName: order.customerName,
+        phone: order.phone,
+        email: order.email,
+        city: order.city,
         ordersCount: 1,
         totalSpent: order.total,
         lastOrderAt: order.createdAt,
@@ -251,10 +248,10 @@ export function customersFromOrders(orders: AdminOrder[]): CustomerSnapshot[] {
     prev.totalSpent += order.total;
     if (new Date(order.createdAt).getTime() > new Date(prev.lastOrderAt).getTime()) {
       prev.lastOrderAt = order.createdAt;
-      prev.city = order.customer.city;
-      prev.phone = order.customer.phone;
-      prev.fullName = order.customer.fullName;
-      prev.email = order.customer.email;
+      prev.city = order.city;
+      prev.phone = order.phone;
+      prev.fullName = order.customerName;
+      prev.email = order.email;
     }
   }
 

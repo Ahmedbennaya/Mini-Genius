@@ -17,7 +17,10 @@ import StatusBadge from "@/components/admin/StatusBadge";
 import { CATEGORIES } from "@/data/site";
 import { formatTND } from "@/lib/utils";
 import { customersFromOrders, listCoupons, listOrders, listProducts } from "@/lib/admin/storage";
+import { orderStatusLabel } from "@/lib/orders";
 import type { AdminOrderStatus } from "@/lib/admin/types";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
   const [products, orders, coupons] = await Promise.all([
@@ -28,7 +31,7 @@ export default async function AdminDashboardPage() {
 
   const customers = customersFromOrders(orders);
   const revenue = orders.reduce((sum, order) => sum + order.total, 0);
-  const newOrders = orders.filter((order) => order.status === "pending").length;
+  const newOrders = orders.filter((order) => order.status === "new").length;
   const outOfStock = products.filter((product) => !product.inStock).length;
   const activeCoupons = coupons.filter((coupon) => coupon.active).length;
   const averageOrder = orders.length ? Math.round(revenue / orders.length) : 0;
@@ -101,8 +104,8 @@ export default async function AdminDashboardPage() {
                 <tr key={order.reference} className="border-b border-slate-100 last:border-none">
                   <AdminTd className="font-bold text-slate-950">{order.reference}</AdminTd>
                   <AdminTd>
-                    <p className="font-semibold text-slate-800">{order.customer.fullName}</p>
-                    <p className="text-xs text-slate-500">{order.customer.city}</p>
+                    <p className="font-semibold text-slate-800">{order.customerName}</p>
+                    <p className="text-xs text-slate-500">{order.city}</p>
                   </AdminTd>
                   <AdminTd>
                     <OrderStatus status={order.status} />
@@ -110,7 +113,7 @@ export default async function AdminDashboardPage() {
                   <AdminTd className="font-semibold text-slate-800">{formatTND(order.total)}</AdminTd>
                   <AdminTd>
                     <Link
-                      href={`/admin/orders/${order.reference}`}
+                      href={`/admin/orders/${order.id}`}
                       className="inline-flex items-center gap-1 rounded-xl border border-slate-200 px-2.5 py-1.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
                     >
                       Ouvrir
@@ -138,7 +141,7 @@ export default async function AdminDashboardPage() {
               {statusStats.map((item) => (
                 <div key={item.status}>
                   <div className="mb-1 flex items-center justify-between text-sm">
-                    <span className="font-semibold capitalize text-slate-700">{item.status}</span>
+                    <span className="font-semibold text-slate-700">{orderStatusLabel(item.status)}</span>
                     <span className="text-slate-500">{item.count}</span>
                   </div>
                   <div className="h-2 rounded-full bg-slate-100">
@@ -253,7 +256,7 @@ function QuickAction({ href, label }: { href: string; label: string }) {
 }
 
 function getStatusStats(statuses: AdminOrderStatus[]) {
-  const order: AdminOrderStatus[] = ["pending", "confirmed", "preparing", "shipped", "delivered", "cancelled"];
+  const order: AdminOrderStatus[] = ["new", "confirmed", "preparing", "shipped", "delivered", "cancelled"];
   return order.map((status) => ({
     status,
     count: statuses.filter((value) => value === status).length,
@@ -263,7 +266,9 @@ function getStatusStats(statuses: AdminOrderStatus[]) {
 function OrderStatus({ status }: { status: AdminOrderStatus }) {
   if (status === "delivered") return <StatusBadge tone="success">Livree</StatusBadge>;
   if (status === "cancelled") return <StatusBadge tone="danger">Annulee</StatusBadge>;
-  if (status === "pending") return <StatusBadge tone="warning">En attente</StatusBadge>;
+  if (status === "new") return <StatusBadge tone="warning">Nouvelle</StatusBadge>;
+  if (status === "confirmed") return <StatusBadge tone="info">Confirmee</StatusBadge>;
+  if (status === "preparing") return <StatusBadge>Preparation</StatusBadge>;
   if (status === "shipped") return <StatusBadge tone="info">Expediee</StatusBadge>;
   return <StatusBadge>{status}</StatusBadge>;
 }

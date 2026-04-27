@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { COOKIE_NAME, verifySessionToken } from "@/lib/admin/auth";
 import { updateOrderStatus } from "@/lib/admin/storage";
+import { isOrderStatus } from "@/lib/orders";
 import type { AdminOrderStatus } from "@/lib/admin/types";
 
 function unauthorized() {
@@ -17,7 +18,7 @@ export async function PATCH(req: Request, { params }: { params: { reference: str
   if (!isAuthed()) return unauthorized();
   try {
     const body = (await req.json()) as { status?: AdminOrderStatus };
-    if (!body.status) {
+    if (!isOrderStatus(body.status)) {
       return NextResponse.json({ ok: false, message: "Statut manquant" }, { status: 400 });
     }
     const updated = await updateOrderStatus(params.reference, body.status);

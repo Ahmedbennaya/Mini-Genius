@@ -6,6 +6,8 @@ import EmptyState from "@/components/admin/EmptyState";
 import { formatTND } from "@/lib/utils";
 import { customersFromOrders, listOrders } from "@/lib/admin/storage";
 
+export const dynamic = "force-dynamic";
+
 export default async function CustomersPage() {
   const customers = customersFromOrders(await listOrders());
   const totalSpent = customers.reduce((sum, customer) => sum + customer.totalSpent, 0);

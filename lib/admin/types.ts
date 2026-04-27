@@ -1,41 +1,8 @@
 import type { Product } from "@/data/products";
+import type { Order, OrderStatus } from "@/lib/orders";
 
-export type AdminOrderStatus =
-  | "pending"
-  | "confirmed"
-  | "preparing"
-  | "shipped"
-  | "delivered"
-  | "cancelled";
-
-export type AdminPaymentStatus = "cod" | "paid" | "refunded";
-
-export type AdminOrder = {
-  reference: string;
-  createdAt: string;
-  status: AdminOrderStatus;
-  paymentStatus: AdminPaymentStatus;
-  customer: {
-    fullName: string;
-    phone: string;
-    email?: string;
-    city: string;
-    address: string;
-    notes?: string;
-  };
-  delivery: "standard" | "express";
-  items: Array<{
-    id: string;
-    slug: string;
-    name: string;
-    price: number;
-    qty: number;
-  }>;
-  subtotal: number;
-  deliveryFee: number;
-  discount?: number;
-  total: number;
-};
+export type AdminOrderStatus = OrderStatus;
+export type AdminOrder = Order;
 
 export type Coupon = {
   code: string;

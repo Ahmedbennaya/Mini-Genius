@@ -1,3 +1,15 @@
+export type OrderStatus =
+  | "new"
+  | "confirmed"
+  | "preparing"
+  | "shipped"
+  | "delivered"
+  | "cancelled";
+
+export type DeliveryMethod = "standard" | "express";
+
+export type PaymentMethod = "cod" | "bank_transfer" | "card";
+
 export type OrderItem = {
   id: string;
   slug: string;
@@ -7,83 +19,57 @@ export type OrderItem = {
 };
 
 export type Order = {
+  id: string;
   reference: string;
   createdAt: string;
-  customer: {
-    fullName: string;
-    phone: string;
-    email?: string;
-    city: string;
-    address: string;
-    notes?: string;
-  };
-  delivery: "standard" | "express";
+  updatedAt: string;
+  status: OrderStatus;
+  customerName: string;
+  phone: string;
+  email?: string;
+  city: string;
+  address: string;
+  notes?: string;
+  delivery: DeliveryMethod;
   items: OrderItem[];
   subtotal: number;
   deliveryFee: number;
+  discount?: number;
   total: number;
+  paymentMethod: PaymentMethod;
 };
 
-const STORAGE_KEY = "mini_genius_orders";
-const COUNTER_KEY = "mini_genius_order_counter";
+export type CreateOrderInput = {
+  customerName: string;
+  phone: string;
+  email?: string;
+  city: string;
+  address: string;
+  notes?: string;
+  delivery: DeliveryMethod;
+  items: OrderItem[];
+  subtotal: number;
+  deliveryFee: number;
+  discount?: number;
+  total: number;
+  paymentMethod: PaymentMethod;
+  status?: OrderStatus;
+};
 
-function pad(n: number, width = 4) {
-  return n.toString().padStart(width, "0");
-}
-
-export function generateOrderReference(): string {
-  if (typeof window === "undefined") {
-    return `MG-${new Date().getFullYear()}-0000`;
-  }
-  const year = new Date().getFullYear();
-  let counter = 0;
-  try {
-    const raw = localStorage.getItem(COUNTER_KEY);
-    counter = raw ? Number(JSON.parse(raw)) || 0 : 0;
-  } catch {
-    counter = 0;
-  }
-  counter += 1;
-  try {
-    localStorage.setItem(COUNTER_KEY, JSON.stringify(counter));
-  } catch {
-    /* ignore */
-  }
-  return `MG-${year}-${pad(counter)}`;
-}
-
-export function saveOrder(order: Order): void {
-  if (typeof window === "undefined") return;
-  let list: Order[] = [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    list = raw ? (JSON.parse(raw) as Order[]) : [];
-  } catch {
-    list = [];
-  }
-  list.unshift(order);
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-  } catch {
-    /* ignore */
-  }
-}
-
-export function getOrders(): Order[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Order[]) : [];
-  } catch {
-    return [];
-  }
-}
+export const ORDER_STATUSES: OrderStatus[] = [
+  "new",
+  "confirmed",
+  "preparing",
+  "shipped",
+  "delivered",
+  "cancelled",
+];
 
 export const DELIVERY_OPTIONS = [
   {
     id: "standard" as const,
     label: "Livraison standard",
-    desc: "24–72h selon la région",
+    desc: "24-72h selon la region",
     fee: 7,
   },
   {
@@ -93,3 +79,56 @@ export const DELIVERY_OPTIONS = [
     fee: 12,
   },
 ];
+
+export const PAYMENT_METHODS = [
+  {
+    id: "cod" as const,
+    label: "Paiement a la livraison",
+    desc: "Le client paie lorsque la commande arrive.",
+  },
+  {
+    id: "bank_transfer" as const,
+    label: "Virement bancaire",
+    desc: "Confirmation apres reception du paiement.",
+  },
+  {
+    id: "card" as const,
+    label: "Carte bancaire",
+    desc: "Paiement en ligne quand le module est active.",
+  },
+];
+
+export function isOrderStatus(value: unknown): value is OrderStatus {
+  return typeof value === "string" && ORDER_STATUSES.includes(value as OrderStatus);
+}
+
+export function isDeliveryMethod(value: unknown): value is DeliveryMethod {
+  return value === "standard" || value === "express";
+}
+
+export function isPaymentMethod(value: unknown): value is PaymentMethod {
+  return value === "cod" || value === "bank_transfer" || value === "card";
+}
+
+export function orderStatusLabel(status: OrderStatus): string {
+  const labels: Record<OrderStatus, string> = {
+    new: "Nouvelle",
+    confirmed: "Confirmee",
+    preparing: "Preparation",
+    shipped: "Expediee",
+    delivered: "Livree",
+    cancelled: "Annulee",
+  };
+
+  return labels[status];
+}
+
+export function paymentMethodLabel(method: PaymentMethod): string {
+  const labels: Record<PaymentMethod, string> = {
+    cod: "Paiement a la livraison",
+    bank_transfer: "Virement bancaire",
+    card: "Carte bancaire",
+  };
+
+  return labels[method];
+}
