@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { Brain, Shapes, Sparkles } from "lucide-react";
 import ToyVisual from "@/components/ui/ToyVisual";
 
@@ -31,6 +31,7 @@ const STEPS = [
 
 export default function Scroll3DShowcase() {
   const ref = useRef<HTMLElement | null>(null);
+  const shouldReduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -42,11 +43,11 @@ export default function Scroll3DShowcase() {
   const videoScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.96, 1.04, 0.98]);
 
   return (
-    <section ref={ref} className="overflow-hidden bg-cream py-14 sm:py-20">
-      <div className="container-mg grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+    <section ref={ref} className="overflow-hidden bg-cream py-12 sm:py-20">
+      <div className="container-mg grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-10">
         <div>
           <span className="eyebrow">Apprendre en mouvement</span>
-          <h2 className="mt-3 max-w-xl font-display text-[clamp(30px,4.5vw,54px)] leading-tight">
+          <h2 className="mt-3 max-w-xl font-display text-[clamp(26px,5vw,54px)] leading-tight">
             Des jouets qui transforment la curiosite en jeu
           </h2>
           <p className="mt-4 max-w-[55ch] text-ink-soft">
@@ -55,10 +56,10 @@ export default function Scroll3DShowcase() {
           </p>
         </div>
 
-        <div className="relative min-h-[520px] [perspective:1200px]">
+        <div className="flex flex-col gap-5 lg:relative lg:block lg:min-h-[520px] lg:[perspective:1200px]">
           <motion.div
-            style={{ rotateX, rotateY, y: lift, scale: videoScale }}
-            className="absolute inset-x-2 top-0 mx-auto h-[360px] max-w-[560px] overflow-hidden rounded-[2rem] border border-white/70 bg-white shadow-lift [transform-style:preserve-3d] sm:h-[410px]"
+            style={shouldReduceMotion ? undefined : { rotateX, rotateY, y: lift, scale: videoScale }}
+            className="mx-auto aspect-video w-full max-w-[560px] overflow-hidden rounded-[2rem] border border-white/70 bg-white shadow-lift [transform-style:preserve-3d] lg:absolute lg:inset-x-2 lg:top-0 lg:aspect-auto lg:h-[410px]"
           >
             <video
               src="/media/3d-educational-toys.mp4"
@@ -72,7 +73,7 @@ export default function Scroll3DShowcase() {
             <div className="absolute inset-0 bg-gradient-to-t from-ink/28 via-transparent to-white/10" />
           </motion.div>
 
-          <div className="absolute inset-x-0 bottom-0 grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-3 lg:absolute lg:inset-x-0 lg:bottom-0">
             {STEPS.map((step, index) => {
               const Icon = step.icon;
               return (

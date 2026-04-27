@@ -9,6 +9,7 @@ import ProductCard from "@/components/product/ProductCard";
 import Stars from "@/components/ui/Stars";
 import { formatTND } from "@/lib/utils";
 import { CATEGORIES } from "@/data/site";
+import Reveal from "@/components/motion/Reveal";
 
 export async function generateStaticParams() {
   return PRODUCTS.map((p) => ({ slug: p.slug }));
@@ -42,7 +43,12 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
   return (
     <div className="container-mg py-10 sm:py-14">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-sm text-ink-soft" aria-label="Fil d'ariane">
+      <Reveal
+        as="nav"
+        variant="fadeIn"
+        ariaLabel="Fil d'ariane"
+        className="flex items-center gap-1.5 text-sm text-ink-soft"
+      >
         <Link href="/" className="hover:text-ink">Accueil</Link>
         <ChevronRight size={14} />
         <Link href="/collection" className="hover:text-ink">Collection</Link>
@@ -52,12 +58,14 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
         </Link>
         <ChevronRight size={14} />
         <span className="truncate text-ink">{product.name}</span>
-      </nav>
+      </Reveal>
 
       <div className="mt-8 grid gap-10 lg:grid-cols-2">
-        <ProductImageGallery product={product} />
+        <Reveal variant="scaleIn">
+          <ProductImageGallery product={product} />
+        </Reveal>
 
-        <div>
+        <Reveal>
           <div className="flex flex-wrap items-center gap-2">
             {product.bestseller && (
               <span className="pill bg-ink/90 text-white border-transparent">Bestseller</span>
@@ -114,7 +122,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
               <ShieldCheck size={16} className="text-coral-deep" /> Paiement à la livraison
             </span>
           </div>
-        </div>
+        </Reveal>
       </div>
 
       {/* Detail sections */}
@@ -204,16 +212,16 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
 
       {/* Related */}
       {related.length > 0 && (
-        <section className="mt-20">
+        <Reveal as="section" className="mt-20">
           <h2 className="font-display text-2xl font-semibold sm:text-3xl">
             Vous pourriez aussi aimer
           </h2>
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {related.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {related.map((p, index) => (
+              <ProductCard key={p.id} product={p} index={index} />
             ))}
           </div>
-        </section>
+        </Reveal>
       )}
     </div>
   );
@@ -231,7 +239,7 @@ function DetailCard({
   children: React.ReactNode;
 }) {
   return (
-    <article className="rounded-3xl border border-cream-300 bg-white p-6 shadow-soft sm:p-8">
+    <Reveal as="article" className="rounded-3xl border border-cream-300 bg-white p-6 shadow-soft sm:p-8">
       <div className="flex items-center gap-2 text-coral-deep">
         <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-cream-200">
           {icon}
@@ -240,6 +248,6 @@ function DetailCard({
       </div>
       <h3 className="mt-3 font-display text-xl font-semibold">{title}</h3>
       <div className="mt-3 text-ink-soft leading-relaxed">{children}</div>
-    </article>
+    </Reveal>
   );
 }

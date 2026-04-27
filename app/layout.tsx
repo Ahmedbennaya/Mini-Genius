@@ -3,6 +3,7 @@ import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
 import SiteChrome from "@/components/layout/SiteChrome";
+import { getSiteUrl } from "@/lib/site-url";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -23,7 +24,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mini-genius-chi.vercel.app"),
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: "Mini Genius | Jouets Éducatifs & Montessori en Tunisie",
     template: "%s | Mini Genius",
@@ -62,7 +63,7 @@ export const metadata: Metadata = {
     apple: "/images/logo.png",
   },
   verification: {
-    google: "09qVE8lnBmrpiKprrOe4AKf3hn3PrcDG946qlUzIIlo",
+    google: "8vkwXJjdctB5KqQln7cx9PANRqTfxoNmozIR3E8h8to",
   },
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },

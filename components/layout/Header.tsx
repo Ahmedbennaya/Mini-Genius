@@ -26,11 +26,15 @@ export default function Header() {
       <header
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${
           scrolled
-            ? "bg-cream/85 backdrop-blur-md border-b border-cream-300 shadow-soft"
-            : "bg-cream/0 border-b border-transparent"
+            ? "border-b border-white/70 bg-cream/82 shadow-soft backdrop-blur-xl backdrop-saturate-150"
+            : "border-b border-transparent bg-cream/0"
         }`}
       >
-        <div className="container-mg flex h-[68px] items-center justify-between gap-4">
+        <div
+          className={`container-mg flex items-center justify-between gap-4 transition-[height] duration-300 ${
+            scrolled ? "h-[62px]" : "h-[68px]"
+          }`}
+        >
           <div className="flex items-center gap-3">
             <button
               className="lg:hidden -ml-2 inline-flex h-10 w-10 items-center justify-center rounded-xl text-ink hover:bg-cream-200"
@@ -61,7 +65,7 @@ export default function Header() {
               rel="noopener"
               aria-label="Besoin d'aide ? Contactez-nous sur WhatsApp"
               title="Besoin d'aide ? WhatsApp"
-              className="hidden md:inline-flex btn-whatsapp btn-sm"
+              className="hidden md:inline-flex btn-whatsapp btn-sm hover:-translate-y-0.5 active:scale-[0.98]"
             >
               <MessageCircle size={16} />
               Aide
@@ -75,7 +79,7 @@ export default function Header() {
             </IconButton>
             <Link
               href="/panier"
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl text-ink hover:bg-cream-200 transition"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl text-ink transition hover:-translate-y-0.5 hover:bg-cream-200"
               aria-label={`Panier (${count})`}
             >
               <ShoppingBag size={20} />
@@ -101,7 +105,7 @@ function IconButton({
   return (
     <button
       {...rest}
-      className={`inline-flex h-10 w-10 items-center justify-center rounded-xl text-ink hover:bg-cream-200 transition ${className}`}
+      className={`inline-flex h-10 w-10 items-center justify-center rounded-xl text-ink transition hover:-translate-y-0.5 hover:bg-cream-200 active:scale-[0.96] ${className}`}
     >
       {children}
     </button>

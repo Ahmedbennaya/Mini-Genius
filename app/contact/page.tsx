@@ -2,7 +2,20 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Phone, MessageCircle, MapPin, Instagram, Facebook, Send, Check, Truck, ShieldCheck } from "lucide-react";
+import {
+  Check,
+  Facebook,
+  Instagram,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Send,
+  ShieldCheck,
+  Truck,
+} from "lucide-react";
+import Reveal from "@/components/motion/Reveal";
+import StaggerGroup, { StaggerItem } from "@/components/motion/StaggerGroup";
 import { whatsappOrderLink } from "@/lib/utils";
 
 export default function ContactPage() {
@@ -15,7 +28,7 @@ export default function ContactPage() {
 
   return (
     <div className="container-mg py-12 sm:py-16">
-      <header className="max-w-2xl">
+      <Reveal as="header" className="max-w-2xl">
         <span className="eyebrow">Contact</span>
         <h1 className="mt-3 font-display text-[clamp(30px,5vw,52px)] leading-[1.05]">
           On vous répond avec plaisir
@@ -24,14 +37,14 @@ export default function ContactPage() {
           Une question, un conseil cadeau, une commande&nbsp;? Notre équipe est joignable
           sur WhatsApp 7j/7 et par email.
         </p>
-      </header>
+      </Reveal>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
-        {/* Form */}
         <motion.form
           onSubmit={submit}
           initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.22 }}
           transition={{ duration: 0.5 }}
           className="rounded-3xl border border-cream-300 bg-white p-6 shadow-card sm:p-8"
         >
@@ -78,31 +91,36 @@ export default function ContactPage() {
           </p>
         </motion.form>
 
-        {/* Info cards */}
-        <div className="space-y-4">
-          <ContactCard
-            icon={<MessageCircle size={20} />}
-            title="WhatsApp"
-            value="+216 00 000 000"
-            href={whatsappOrderLink()}
-            cta="Discuter sur WhatsApp"
-          />
-          <ContactCard
-            icon={<Phone size={20} />}
-            title="Téléphone"
-            value="+216 00 000 000"
-            href="tel:+21600000000"
-            cta="Appeler"
-          />
-          <ContactCard
-            icon={<Mail size={20} />}
-            title="Email"
-            value="bonjour@minigenius.tn"
-            href="mailto:bonjour@minigenius.tn"
-            cta="Écrire un email"
-          />
+        <StaggerGroup className="space-y-4">
+          <StaggerItem>
+            <ContactCard
+              icon={<MessageCircle size={20} />}
+              title="WhatsApp"
+              value="+216 00 000 000"
+              href={whatsappOrderLink()}
+              cta="Discuter sur WhatsApp"
+            />
+          </StaggerItem>
+          <StaggerItem>
+            <ContactCard
+              icon={<Phone size={20} />}
+              title="Téléphone"
+              value="+216 00 000 000"
+              href="tel:+21600000000"
+              cta="Appeler"
+            />
+          </StaggerItem>
+          <StaggerItem>
+            <ContactCard
+              icon={<Mail size={20} />}
+              title="Email"
+              value="bonjour@minigenius.tn"
+              href="mailto:bonjour@minigenius.tn"
+              cta="Écrire un email"
+            />
+          </StaggerItem>
 
-          <div className="rounded-3xl border border-cream-300 bg-white p-6 shadow-soft">
+          <StaggerItem className="rounded-3xl border border-cream-300 bg-white p-6 shadow-soft">
             <div className="flex items-center gap-2">
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-cream-200 text-coral-deep">
                 <MapPin size={18} />
@@ -115,7 +133,7 @@ export default function ContactPage() {
                 target="_blank"
                 rel="noopener"
                 aria-label="Instagram"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-cream-300 hover:text-coral-deep hover:shadow-soft transition"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-cream-300 transition hover:text-coral-deep hover:shadow-soft"
               >
                 <Instagram size={18} />
               </a>
@@ -124,22 +142,31 @@ export default function ContactPage() {
                 target="_blank"
                 rel="noopener"
                 aria-label="Facebook"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-cream-300 hover:text-coral-deep hover:shadow-soft transition"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-cream-300 transition hover:text-coral-deep hover:shadow-soft"
               >
                 <Facebook size={18} />
               </a>
             </div>
-          </div>
+          </StaggerItem>
 
-          <div className="rounded-3xl border border-cream-300 bg-cream-200/60 p-6">
+          <StaggerItem className="rounded-3xl border border-cream-300 bg-cream-200/60 p-6">
             <h3 className="font-display text-lg font-semibold">Livraison & paiement</h3>
             <ul className="mt-3 space-y-2 text-[15px] text-ink">
-              <li className="flex items-center gap-2"><Truck size={15} className="text-coral-deep" /> Livraison partout en Tunisie (24–72h)</li>
-              <li className="flex items-center gap-2"><ShieldCheck size={15} className="text-coral-deep" /> Paiement à la livraison disponible</li>
-              <li className="flex items-center gap-2"><MessageCircle size={15} className="text-coral-deep" /> Suivi de commande sur WhatsApp</li>
+              <li className="flex items-center gap-2">
+                <Truck size={15} className="text-coral-deep" />
+                Livraison partout en Tunisie (24-72h)
+              </li>
+              <li className="flex items-center gap-2">
+                <ShieldCheck size={15} className="text-coral-deep" />
+                Paiement à la livraison disponible
+              </li>
+              <li className="flex items-center gap-2">
+                <MessageCircle size={15} className="text-coral-deep" />
+                Suivi de commande sur WhatsApp
+              </li>
             </ul>
-          </div>
-        </div>
+          </StaggerItem>
+        </StaggerGroup>
       </div>
     </div>
   );
@@ -185,7 +212,7 @@ function ContactCard({
       href={href}
       target={href.startsWith("http") ? "_blank" : undefined}
       rel="noopener"
-      className="group flex items-center justify-between gap-4 rounded-3xl border border-cream-300 bg-white p-5 shadow-soft transition hover:shadow-card"
+      className="group flex items-center justify-between gap-4 rounded-3xl border border-cream-300 bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-card"
     >
       <div className="flex items-center gap-3">
         <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-cream-200 text-coral-deep">
@@ -196,7 +223,7 @@ function ContactCard({
           <div className="font-semibold">{value}</div>
         </div>
       </div>
-      <span className="hidden text-sm font-semibold text-coral-deep group-hover:underline sm:block">
+      <span className="hidden text-sm font-semibold text-coral-deep transition group-hover:translate-x-1 sm:block">
         {cta} →
       </span>
     </a>

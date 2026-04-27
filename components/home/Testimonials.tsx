@@ -1,14 +1,12 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
+import StaggerGroup, { StaggerItem } from "@/components/motion/StaggerGroup";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Stars from "@/components/ui/Stars";
 import { TESTIMONIALS, PALETTE_HEX } from "@/data/site";
 
 export default function Testimonials() {
   return (
-    <section className="bg-cream-200/80 py-20 sm:py-24">
+    <section className="bg-cream-200/80 py-14 sm:py-20 lg:py-24">
       <div className="container-mg">
         <SectionHeading
           eyebrow="Avis de parents"
@@ -16,17 +14,14 @@ export default function Testimonials() {
           description="Des familles partout en Tunisie nous font confiance pour offrir le meilleur à leurs enfants."
         />
 
-        <ul className="mt-12 grid gap-5 lg:grid-cols-3">
-          {TESTIMONIALS.map((t, i) => {
+        <StaggerGroup as="ul" className="mt-12 grid gap-5 lg:grid-cols-3">
+          {TESTIMONIALS.map((t) => {
             const tint = PALETTE_HEX[t.palette];
             return (
-              <motion.li
+              <StaggerItem
+                as="li"
                 key={t.name}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.45, delay: i * 0.06 }}
-                className="card-base relative p-6 lg:p-8"
+                className="card-base relative p-6 transition hover:-translate-y-1 hover:shadow-card lg:p-8"
               >
                 <span
                   className="absolute -top-3 left-6 inline-flex h-9 w-9 items-center justify-center rounded-xl text-white shadow-card"
@@ -48,10 +43,10 @@ export default function Testimonials() {
                     <div className="text-sm text-ink-soft">{t.city}</div>
                   </div>
                 </div>
-              </motion.li>
+              </StaggerItem>
             );
           })}
-        </ul>
+        </StaggerGroup>
       </div>
     </section>
   );

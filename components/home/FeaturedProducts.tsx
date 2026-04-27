@@ -7,7 +7,7 @@ import ProductCard from "@/components/product/ProductCard";
 export default function FeaturedProducts() {
   const list = PRODUCTS.slice(0, 8);
   return (
-    <section className="container-mg py-20 sm:py-24">
+    <section className="container-mg py-14 sm:py-20 lg:py-24">
       <SectionHeading
         eyebrow="Nos coups de cœur"
         title="Produits populaires"
@@ -21,8 +21,8 @@ export default function FeaturedProducts() {
       />
 
       <div className="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-        {list.map((p) => (
-          <ProductCard key={p.id} product={p} />
+        {list.map((p, index) => (
+          <ProductCard key={p.id} product={p} index={index} />
         ))}
       </div>
     </section>

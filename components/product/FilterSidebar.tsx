@@ -16,17 +16,18 @@ const SORTS = [
 export default function FilterSidebar() {
   const router = useRouter();
   const sp = useSearchParams();
+  const searchParams = sp ?? new URLSearchParams();
 
   const [open, setOpen] = useState(false);
 
-  const cat = sp.get("cat") ?? "all";
-  const age = sp.get("age") ?? "all";
-  const sort = sp.get("sort") ?? "popular";
-  const q = sp.get("q") ?? "";
-  const max = Number(sp.get("max") ?? 250);
+  const cat = searchParams.get("cat") ?? "all";
+  const age = searchParams.get("age") ?? "all";
+  const sort = searchParams.get("sort") ?? "popular";
+  const q = searchParams.get("q") ?? "";
+  const max = Number(searchParams.get("max") ?? 250);
 
   const update = (patch: Record<string, string | number | undefined>) => {
-    const params = new URLSearchParams(sp.toString());
+    const params = new URLSearchParams(searchParams.toString());
     Object.entries(patch).forEach(([k, v]) => {
       if (v === undefined || v === "" || v === "all") params.delete(k);
       else params.set(k, String(v));

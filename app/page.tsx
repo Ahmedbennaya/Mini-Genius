@@ -1,27 +1,50 @@
 import Hero from "@/components/home/Hero";
-import Scroll3DShowcase from "@/components/home/Scroll3DShowcase";
 import TrustBadges from "@/components/home/TrustBadges";
 import AgeCategories from "@/components/home/AgeCategories";
-import CategoryCards from "@/components/home/CategoryCards";
+import Scroll3DShowcase from "@/components/home/Scroll3DShowcase";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 import BenefitsSection from "@/components/home/BenefitsSection";
-import GiftBoxSection from "@/components/home/GiftBoxSection";
+import CategoryCards from "@/components/home/CategoryCards";
+import HowItWorks from "@/components/home/HowItWorks";
 import Testimonials from "@/components/home/Testimonials";
-import Newsletter from "@/components/home/Newsletter";
+import GiftBoxSection from "@/components/home/GiftBoxSection";
+import FAQ from "@/components/home/FAQ";
+import Reveal from "@/components/motion/Reveal";
 
 export default function HomePage() {
   return (
     <>
       <Hero />
-      <Scroll3DShowcase />
-      <TrustBadges />
-      <AgeCategories />
-      <CategoryCards />
-      <FeaturedProducts />
-      <BenefitsSection />
-      <GiftBoxSection />
-      <Testimonials />
-      <Newsletter />
+      <Reveal>
+        <TrustBadges />
+      </Reveal>
+      <Reveal>
+        <AgeCategories />
+      </Reveal>
+      <Reveal variant="scaleIn">
+        <Scroll3DShowcase />
+      </Reveal>
+      <Reveal>
+        <FeaturedProducts />
+      </Reveal>
+      <Reveal>
+        <BenefitsSection />
+      </Reveal>
+      <Reveal>
+        <CategoryCards />
+      </Reveal>
+      <Reveal>
+        <HowItWorks />
+      </Reveal>
+      <Reveal>
+        <Testimonials />
+      </Reveal>
+      <Reveal variant="scaleIn">
+        <GiftBoxSection />
+      </Reveal>
+      <Reveal>
+        <FAQ />
+      </Reveal>
     </>
   );
 }

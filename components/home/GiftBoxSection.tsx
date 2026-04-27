@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Gift } from "lucide-react";
+import Parallax from "@/components/motion/Parallax";
 import ToyVisual from "@/components/ui/ToyVisual";
 
 export default function GiftBoxSection() {
   return (
-    <section className="container-mg py-20 sm:py-24">
+    <section className="container-mg py-14 sm:py-20 lg:py-24">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -15,10 +16,10 @@ export default function GiftBoxSection() {
         transition={{ duration: 0.6 }}
         className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-coral/85 via-coral to-coral-deep p-10 text-white shadow-lift sm:p-14 lg:p-20"
       >
-        {/* decorative blobs */}
+        {/* soft light fields */}
         <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-16 -right-16 h-64 w-64 rounded-full bg-white/15 blur-3xl" />
-          <div className="absolute -bottom-20 -left-12 h-72 w-72 rounded-full bg-butter/40 blur-3xl" />
+          <div className="absolute inset-0 bg-[linear-gradient(125deg,rgba(255,255,255,.18),transparent_38%,rgba(245,215,122,.28)_72%,transparent)]" />
+          <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.5)_1px,transparent_1px)] [background-size:46px_46px]" />
         </div>
 
         <div className="relative grid gap-10 lg:grid-cols-[1.3fr_1fr] lg:items-center">
@@ -51,7 +52,7 @@ export default function GiftBoxSection() {
             </div>
           </div>
 
-          <div className="relative h-[260px] lg:h-[340px]">
+          <Parallax distance={18} scale className="relative h-[260px] lg:h-[340px]">
             <div className="absolute right-4 top-2 animate-float-a">
               <ToyVisual shape="gift" palette="butter" size={200} />
             </div>
@@ -61,7 +62,7 @@ export default function GiftBoxSection() {
             <div className="absolute right-1/3 bottom-2 animate-float-b">
               <ToyVisual shape="ball" palette="mint" size={110} />
             </div>
-          </div>
+          </Parallax>
         </div>
       </motion.div>
     </section>

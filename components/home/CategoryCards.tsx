@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import StaggerGroup, { StaggerItem } from "@/components/motion/StaggerGroup";
 import SectionHeading from "@/components/ui/SectionHeading";
 import ToyVisual from "@/components/ui/ToyVisual";
 import { CATEGORIES, PALETTE_HEX } from "@/data/site";
 
 export default function CategoryCards() {
   return (
-    <section className="bg-cream-200/80 py-20 sm:py-24">
+    <section className="bg-cream-200/80 py-14 sm:py-20 lg:py-24">
       <div className="container-mg">
         <SectionHeading
           eyebrow="Catégories"
@@ -17,20 +17,17 @@ export default function CategoryCards() {
           description="Du jouet d'éveil pour les plus petits aux défis STEM pour les grands curieux — tout est testé et choisi avec soin."
         />
 
-        <ul className="mt-12 grid gap-7 sm:grid-cols-2">
-          {CATEGORIES.map((c, i) => {
+        <StaggerGroup as="ul" className="mt-12 grid gap-7 sm:grid-cols-2 [perspective:1200px]">
+          {CATEGORIES.map((c) => {
             const tint = PALETTE_HEX[c.palette];
             return (
-              <motion.li
+              <StaggerItem
+                as="li"
                 key={c.id}
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.45, delay: i * 0.05 }}
               >
                 <Link
                   href={`/collection?cat=${c.id}`}
-                  className="card-base group flex h-full flex-col overflow-hidden hover:shadow-lift"
+                  className="card-base group flex h-full flex-col overflow-hidden transition-all duration-500 [transform-style:preserve-3d] hover:-translate-y-1.5 hover:[transform:rotateX(2deg)_rotateY(2deg)] hover:shadow-lift"
                 >
                   <div
                     className="relative flex h-64 items-center justify-center"
@@ -54,10 +51,10 @@ export default function CategoryCards() {
                     </span>
                   </div>
                 </Link>
-              </motion.li>
+              </StaggerItem>
             );
           })}
-        </ul>
+        </StaggerGroup>
       </div>
     </section>
   );

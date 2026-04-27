@@ -6,6 +6,7 @@ import ProductCard from "@/components/product/ProductCard";
 import FilterSidebar from "@/components/product/FilterSidebar";
 import { PackageX } from "lucide-react";
 import Link from "next/link";
+import Reveal from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
   title: "Collection — Jouets éducatifs",
@@ -54,7 +55,7 @@ export default function CollectionPage({ searchParams }: { searchParams: SP }) {
 
   return (
     <div className="container-mg py-12 sm:py-16">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <Reveal as="header" className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <span className="eyebrow">Collection</span>
           <h1 className="mt-3 font-display text-[clamp(28px,4vw,46px)] leading-tight">
@@ -64,7 +65,7 @@ export default function CollectionPage({ searchParams }: { searchParams: SP }) {
             {list.length} produit{list.length > 1 ? "s" : ""} trouvé{list.length > 1 ? "s" : ""}
           </p>
         </div>
-      </header>
+      </Reveal>
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[260px_1fr]">
         {/* The FilterSidebar component renders a mobile trigger button + drawer
@@ -73,17 +74,17 @@ export default function CollectionPage({ searchParams }: { searchParams: SP }) {
           <FilterSidebar />
         </Suspense>
 
-        <div>
+        <Reveal variant="fadeIn">
           {list.length === 0 ? (
             <EmptyState />
           ) : (
             <div className="grid gap-7 sm:grid-cols-2">
-              {list.map((p) => (
-                <ProductCard key={p.id} product={p} />
+              {list.map((p, index) => (
+                <ProductCard key={p.id} product={p} index={index} />
               ))}
             </div>
           )}
-        </div>
+        </Reveal>
       </div>
     </div>
   );

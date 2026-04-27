@@ -78,13 +78,14 @@ export type AgeDef = {
   max: number;
   palette: Palette;
   shape: ToyShape;
+  image?: string;
 };
 
 export const AGES: AgeDef[] = [
-  { id: "1-2", label: "1–2 ans", desc: "Éveil sensoriel et premiers gestes", min: 1, max: 2, palette: "coral", shape: "ball" },
-  { id: "3-5", label: "3–5 ans", desc: "Imagination et apprentissages", min: 3, max: 5, palette: "butter", shape: "cube" },
-  { id: "6-8", label: "6–8 ans", desc: "Logique, lecture et créativité", min: 6, max: 8, palette: "sky", shape: "rocket" },
-  { id: "9+", label: "9+ ans", desc: "STEM, défis et grands projets", min: 9, max: 99, palette: "mint", shape: "ring" },
+  { id: "1-2", label: "1–2 ans", desc: "Éveil sensoriel et premiers gestes", min: 1, max: 2, palette: "coral", shape: "ball", image: "/images/age-1-2.jpg" },
+  { id: "3-5", label: "3–5 ans", desc: "Imagination et apprentissages", min: 3, max: 5, palette: "butter", shape: "cube", image: "/images/age-3-5.jpg" },
+  { id: "6-8", label: "6–8 ans", desc: "Logique, lecture et créativité", min: 6, max: 8, palette: "sky", shape: "rocket", image: "/images/age-6-8.jpg" },
+  { id: "9+", label: "9+ ans", desc: "STEM, défis et grands projets", min: 9, max: 99, palette: "mint", shape: "ring", image: "/images/age-9-plus.jpg" },
 ];
 
 export const TESTIMONIALS = [

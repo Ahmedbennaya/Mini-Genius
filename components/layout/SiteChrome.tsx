@@ -4,10 +4,11 @@ import { usePathname } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FloatingWhatsApp from "@/components/layout/FloatingWhatsApp";
+import BackToTop from "@/components/ui/BackToTop";
 
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdmin = pathname.startsWith("/admin");
+  const isAdmin = (pathname ?? "").startsWith("/admin");
 
   if (isAdmin) {
     return <>{children}</>;
@@ -25,6 +26,7 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
       <main id="main">{children}</main>
       <Footer />
       <FloatingWhatsApp />
+      <BackToTop />
     </>
   );
 }

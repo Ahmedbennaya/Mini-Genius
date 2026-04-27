@@ -12,7 +12,7 @@ import Stars from "@/components/ui/Stars";
 import { useCart } from "@/lib/cart-context";
 import { cn, formatTND } from "@/lib/utils";
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
   const tint = PALETTE_HEX[product.palette];
   const images = getProductImages(product);
   const imageFrame = getProductImageFrame(product);
@@ -43,8 +43,9 @@ export default function ProductCard({ product }: { product: Product }) {
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.45 }}
-      className="group relative flex h-full min-h-[610px] flex-col overflow-hidden rounded-3xl border border-cream-300 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+      transition={{ duration: 0.45, delay: Math.min(index * 0.045, 0.28) }}
+      whileHover={{ y: -5, rotateX: 1.2, rotateY: -1.2 }}
+      className="group relative flex h-full min-h-[610px] flex-col overflow-hidden rounded-3xl border border-cream-300 bg-white shadow-card transition-shadow duration-300 [transform-style:preserve-3d] hover:shadow-lift"
     >
       <div
         className="relative overflow-hidden rounded-b-[1.35rem]"
