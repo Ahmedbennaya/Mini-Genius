@@ -1,4 +1,5 @@
 import Hero from "@/components/home/Hero";
+import Scroll3DShowcase from "@/components/home/Scroll3DShowcase";
 import TrustBadges from "@/components/home/TrustBadges";
 import AgeCategories from "@/components/home/AgeCategories";
 import CategoryCards from "@/components/home/CategoryCards";
@@ -12,6 +13,7 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <Scroll3DShowcase />
       <TrustBadges />
       <AgeCategories />
       <CategoryCards />
