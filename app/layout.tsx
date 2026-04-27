@@ -23,7 +23,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://minigenius.tn"),
+  metadataBase: new URL("https://mini-genius-chi.vercel.app"),
   title: {
     default: "Mini Genius | Jouets Éducatifs & Montessori en Tunisie",
     template: "%s | Mini Genius",
@@ -46,8 +46,23 @@ export const metadata: Metadata = {
     locale: "fr_TN",
     title: "Mini Genius | Jouets Éducatifs & Montessori en Tunisie",
     description:
-      "Jouets Montessori, sensoriels, STEM et coffrets cadeaux pour enfants. Livraison partout en Tunisie.",
+      "Découvrez des jouets éducatifs, Montessori, sensoriels et créatifs pour enfants. Livraison partout en Tunisie. Apprendre en jouant avec Mini Genius.",
     siteName: "Mini Genius",
+    images: [
+      {
+        url: "/images/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "Mini Genius logo",
+      },
+    ],
+  },
+  icons: {
+    icon: "/images/logo.png",
+    apple: "/images/logo.png",
+  },
+  verification: {
+    google: "09qVE8lnBmrpiKprrOe4AKf3hn3PrcDG946qlUzIIlo",
   },
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
