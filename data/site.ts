@@ -2,6 +2,7 @@ import type { Palette, ToyShape } from "./products";
 
 export const NAV = [
   { label: "Accueil", href: "/" },
+  { label: "Salle de jeux", href: "/fr" },
   { label: "Jouets par âge", href: "/collection?age=all" },
   { label: "Montessori", href: "/collection?cat=montessori" },
   { label: "STEM", href: "/collection?cat=stem" },

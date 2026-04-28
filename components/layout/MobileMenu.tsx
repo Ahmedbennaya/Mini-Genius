@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Search, MessageCircle, ShoppingBag, User, ChevronRight } from "lucide-react";
+import { BrainCircuit, X, Search, MessageCircle, ShoppingBag, User, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NAV } from "@/data/site";
 import { createMetaEventId, trackMetaEvent } from "@/lib/meta-pixel";
@@ -94,9 +94,16 @@ export default function MobileMenu({ open, onClose }: Props) {
                     <Link
                       href={item.href}
                       onClick={onClose}
-                      className="group flex items-center justify-between rounded-2xl px-4 py-3.5 text-[15px] font-medium text-ink hover:bg-white"
+                      className={
+                        item.href === "/fr"
+                          ? "group flex items-center justify-between rounded-2xl bg-coral/25 px-4 py-3.5 text-[15px] font-bold text-ink hover:bg-coral/35"
+                          : "group flex items-center justify-between rounded-2xl px-4 py-3.5 text-[15px] font-medium text-ink hover:bg-white"
+                      }
                     >
-                      <span>{item.label}</span>
+                      <span className="inline-flex items-center gap-2">
+                        {item.href === "/fr" ? <BrainCircuit size={17} /> : null}
+                        {item.label}
+                      </span>
                       <ChevronRight size={18} className="text-ink-mute group-hover:translate-x-0.5 transition" />
                     </Link>
                   </li>

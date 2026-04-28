@@ -9,7 +9,7 @@ function envEmail() {
 }
 
 function envPassword() {
-  return process.env.ADMIN_PASSWORD || "change-this-password";
+  return process.env.ADMIN_PASSWORD || "admin123";
 }
 
 function signingSecret() {
@@ -25,15 +25,15 @@ function signPayload(payload: string) {
 
 export function validateAdminCredentials(email: string, password: string): boolean {
   const expectedEmail = envEmail().trim().toLowerCase();
+  const expectedUsername = process.env.ADMIN_USERNAME || "admin";
   const expectedPassword = envPassword();
   const incomingEmail = email.trim().toLowerCase();
 
   const hash = (value: string) => crypto.createHash("sha256").update(value).digest();
 
-  const validEmail = crypto.timingSafeEqual(
-    hash(incomingEmail),
-    hash(expectedEmail)
-  );
+  const validEmail =
+    crypto.timingSafeEqual(hash(incomingEmail), hash(expectedEmail)) ||
+    crypto.timingSafeEqual(hash(incomingEmail), hash(expectedUsername.toLowerCase()));
 
   const validPassword = crypto.timingSafeEqual(
     hash(password),

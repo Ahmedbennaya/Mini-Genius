@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Search, User, ShoppingBag, Menu, MessageCircle } from "lucide-react";
+import { BrainCircuit, Search, User, ShoppingBag, Menu, MessageCircle } from "lucide-react";
 import { NAV } from "@/data/site";
 import { useCart } from "@/lib/cart-context";
 import { createMetaEventId, trackMetaEvent } from "@/lib/meta-pixel";
@@ -63,8 +63,13 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="relative inline-flex items-center px-3.5 py-2 text-[14.5px] font-medium text-ink-soft transition-colors hover:text-ink after:absolute after:left-3.5 after:right-3.5 after:bottom-1 after:h-[2px] after:scale-x-0 after:rounded after:bg-coral-deep after:transition-transform hover:after:scale-x-100"
+                className={
+                  item.href === "/fr"
+                    ? "inline-flex items-center gap-1.5 rounded-full bg-coral/25 px-3.5 py-2 text-[14.5px] font-bold text-ink shadow-soft transition hover:-translate-y-0.5 hover:bg-coral/40"
+                    : "relative inline-flex items-center px-3.5 py-2 text-[14.5px] font-medium text-ink-soft transition-colors hover:text-ink after:absolute after:left-3.5 after:right-3.5 after:bottom-1 after:h-[2px] after:scale-x-0 after:rounded after:bg-coral-deep after:transition-transform hover:after:scale-x-100"
+                }
               >
+                {item.href === "/fr" ? <BrainCircuit size={15} /> : null}
                 {item.label}
               </Link>
             ))}

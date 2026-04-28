@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
+import { GAMES } from "@/data/iq/games";
 import { PRODUCTS } from "@/data/products";
+import { SUPPORTED_LOCALES } from "@/lib/iq/i18n";
 import { getSiteUrl } from "@/lib/site-url";
 
 const staticRoutes = [
@@ -29,5 +31,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: product.bestseller ? 0.9 : 0.8,
   }));
 
-  return [...staticEntries, ...productEntries];
+  const iqStaticEntries: MetadataRoute.Sitemap = SUPPORTED_LOCALES.flatMap((locale) =>
+    ["", "/games", "/test", "/test/results", "/dashboard"].map((path) => ({
+      url: `${baseUrl}/${locale}${path}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: path === "" ? 0.9 : 0.75,
+    })),
+  );
+
+  const iqGameEntries: MetadataRoute.Sitemap = SUPPORTED_LOCALES.flatMap((locale) =>
+    GAMES.map((game) => ({
+      url: `${baseUrl}/${locale}/games/${game.slug}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: game.recommended ? 0.75 : 0.65,
+    })),
+  );
+
+  return [...staticEntries, ...productEntries, ...iqStaticEntries, ...iqGameEntries];
 }

@@ -2,7 +2,11 @@ import Link from "next/link";
 import {
   ArrowUpRight,
   BarChart3,
+  BrainCircuit,
   Boxes,
+  FileJson,
+  Gamepad2,
+  Languages,
   Package,
   Plus,
   ShoppingCart,
@@ -11,9 +15,15 @@ import {
   WalletCards,
 } from "lucide-react";
 import AdminCard from "@/components/admin/AdminCard";
+import AdminGameTable from "@/components/admin/AdminGameTable";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import AdminQuestionTable from "@/components/admin/AdminQuestionTable";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminTable, { AdminTableHead, AdminTd, AdminTh } from "@/components/admin/AdminTable";
 import StatusBadge from "@/components/admin/StatusBadge";
+import { CATEGORY_IDS, DIFFICULTIES } from "@/data/iq/constants";
+import { GAMES } from "@/data/iq/games";
+import { TEST_QUESTIONS } from "@/data/iq/testQuestions";
 import { CATEGORIES } from "@/data/site";
 import { formatTND } from "@/lib/utils";
 import { customersFromOrders, listCoupons, listOrders, listProducts } from "@/lib/admin/storage";
@@ -78,6 +88,94 @@ export default async function AdminDashboardPage() {
         <StatCard title="Nouvelles" value={String(newOrders)} icon={<Truck size={18} />} hint="A traiter rapidement" tone="amber" />
         <StatCard title="Produits" value={String(products.length)} icon={<Package size={18} />} hint={`${outOfStock} rupture`} tone="emerald" />
         <StatCard title="Coupons" value={String(activeCoupons)} icon={<Sparkles size={18} />} hint={`${customers.length} clients`} tone="lavender" />
+      </section>
+
+      <section id="iq-overview" className="mt-6 grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
+        <AdminSidebar />
+        <div className="space-y-5">
+          <AdminCard
+            title="Mini Genius IQ Room"
+            description="Mock CMS for games, skill tests, categories, translations and progress data."
+            icon={<BrainCircuit size={18} />}
+            actions={
+              <Link
+                href="/fr"
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-soft transition hover:bg-slate-50"
+              >
+                Open IQ Room
+                <ArrowUpRight size={15} />
+              </Link>
+            }
+          >
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <StatCard title="IQ games" value={String(GAMES.length)} icon={<Gamepad2 size={18} />} hint="Local data ready" tone="blue" />
+              <StatCard title="Questions" value={String(TEST_QUESTIONS.length)} icon={<BrainCircuit size={18} />} hint="Child-friendly" tone="rose" />
+              <StatCard title="Categories" value={String(CATEGORY_IDS.length)} icon={<Boxes size={18} />} hint="10 skill areas" tone="emerald" />
+              <StatCard title="Languages" value="3" icon={<Languages size={18} />} hint="FR / AR / EN" tone="lavender" />
+            </div>
+          </AdminCard>
+
+          <section id="iq-games">
+            <AdminCard
+              title="Manage IQ games"
+              description="Preview table for add/edit/delete flows. Replace local data with database mutations later."
+              icon={<Gamepad2 size={18} />}
+              actions={
+                <div className="flex flex-wrap gap-2">
+                  <button className="rounded-2xl bg-slate-950 px-4 py-2.5 text-sm font-bold text-white shadow-soft">Add game</button>
+                  <a
+                    href="data:application/json;charset=utf-8,%5B%5D"
+                    download="mini-genius-games-export.json"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-soft"
+                  >
+                    <FileJson size={15} />
+                    Export JSON
+                  </a>
+                </div>
+              }
+            >
+              <AdminGameTable games={GAMES} />
+            </AdminCard>
+          </section>
+
+          <section id="iq-questions">
+            <AdminCard
+              title="Manage IQ questions"
+              description="Questions are grouped by age, category, difficulty and points."
+              icon={<BrainCircuit size={18} />}
+              actions={
+                <button className="rounded-2xl bg-slate-950 px-4 py-2.5 text-sm font-bold text-white shadow-soft">
+                  Add question
+                </button>
+              }
+            >
+              <AdminQuestionTable questions={TEST_QUESTIONS} />
+            </AdminCard>
+          </section>
+
+          <section id="iq-translations" className="grid gap-5 lg:grid-cols-2">
+            <AdminCard title="Translations" description="French, Arabic RTL and English dictionaries." icon={<Languages size={18} />}>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {["fr", "ar", "en"].map((locale) => (
+                  <div key={locale} className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-2xl font-semibold uppercase text-slate-950">{locale}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">Navigation, games, test, admin UI</p>
+                  </div>
+                ))}
+              </div>
+            </AdminCard>
+            <AdminCard title="Difficulty" description="Editable scale for child-friendly challenge levels." icon={<BarChart3 size={18} />}>
+              <div id="iq-difficulty" className="grid gap-3">
+                {DIFFICULTIES.map((difficulty, index) => (
+                  <div key={difficulty} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4">
+                    <span className="font-bold capitalize text-slate-800">{difficulty}</span>
+                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">Level {index + 1}</span>
+                  </div>
+                ))}
+              </div>
+            </AdminCard>
+          </section>
+        </div>
       </section>
 
       <section className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.85fr)]">

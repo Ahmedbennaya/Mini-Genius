@@ -8,9 +8,11 @@ import BackToTop from "@/components/ui/BackToTop";
 
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdmin = (pathname ?? "").startsWith("/admin");
+  const currentPath = pathname ?? "";
+  const isAdmin = currentPath.startsWith("/admin");
+  const isIqRoom = /^\/(fr|ar|en)(\/|$)/.test(currentPath);
 
-  if (isAdmin) {
+  if (isAdmin || isIqRoom) {
     return <>{children}</>;
   }
 

@@ -41,21 +41,21 @@ export default function AdminLoginPage() {
         <div className="mb-7 text-center">
           <Logo variant="admin" className="justify-center" />
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Admin Login</h1>
-          <p className="mt-2 text-sm text-slate-500">Connectez-vous pour gerer la boutique.</p>
+          <p className="mt-2 text-sm text-slate-500">Connectez-vous pour gerer la boutique et IQ Room.</p>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
           <label className="block">
-            <span className="mb-1 block text-sm font-semibold text-slate-700">Email admin</span>
+            <span className="mb-1 block text-sm font-semibold text-slate-700">Identifiant admin</span>
             <span className="relative block">
               <Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
               <input
-                type="email"
+                type="text"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-3 text-sm outline-none ring-rose-200 transition focus:border-rose-300 focus:ring-4"
-                placeholder="admin@minigenius.tn"
+                placeholder="admin"
               />
             </span>
           </label>
