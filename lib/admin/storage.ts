@@ -34,7 +34,75 @@ const PRODUCT_CATEGORY_IDS = [
   "cadeaux",
 ] as const;
 
+const KV_KEY_PREFIX = process.env.ADMIN_STORAGE_KEY_PREFIX || "mini-genius:admin";
+const KV_KEY_BY_FILE: Record<string, string> = {
+  [CATALOG_FILE]: `${KV_KEY_PREFIX}:catalog`,
+  [COLLECTIONS_FILE]: `${KV_KEY_PREFIX}:collections`,
+  [COUPONS_FILE]: `${KV_KEY_PREFIX}:coupons`,
+  [MEDIA_FILE]: `${KV_KEY_PREFIX}:media`,
+  [SETTINGS_FILE]: `${KV_KEY_PREFIX}:settings`,
+};
+
+type KvConfig = { url: string; token: string };
+type KvResponse<T> = { result?: T; error?: string };
+
+function getKvConfig(): KvConfig | null {
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+  return { url: url.replace(/\/$/, ""), token };
+}
+
+function isVercelReadonlyRuntime() {
+  return process.env.VERCEL === "1";
+}
+
+function missingProductionStorageError() {
+  return new Error(
+    "Admin storage is not configured for production. Add KV_REST_API_URL and KV_REST_API_TOKEN on Vercel."
+  );
+}
+
+async function kvCommand<T>(config: KvConfig, command: Array<string | number>): Promise<T> {
+  const response = await fetch(config.url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${config.token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(command),
+    cache: "no-store",
+  });
+
+  const payload = (await response.json()) as KvResponse<T>;
+  if (!response.ok || payload.error) {
+    throw new Error(payload.error || "Admin storage request failed");
+  }
+  return payload.result as T;
+}
+
+function kvKeyForFile(filePath: string): string | null {
+  return KV_KEY_BY_FILE[filePath] || null;
+}
+
 async function readJsonFile<T>(filePath: string, fallback: T): Promise<T> {
+  const kv = getKvConfig();
+  const key = kvKeyForFile(filePath);
+
+  if (kv && key) {
+    const raw = await kvCommand<string | null>(kv, ["GET", key]);
+    if (raw) {
+      try {
+        return JSON.parse(raw) as T;
+      } catch {
+        // Corrupt KV value — fall through to bundled file as a last resort.
+      }
+    }
+  }
+
+  // Bundled JSON files ship with the deployment and are readable even on
+  // serverless. We use them as the seed when KV is empty, and as the source
+  // of truth in local development.
   try {
     const raw = await fs.readFile(filePath, "utf8");
     return JSON.parse(raw) as T;
@@ -44,11 +112,28 @@ async function readJsonFile<T>(filePath: string, fallback: T): Promise<T> {
 }
 
 async function writeJsonFile<T>(filePath: string, value: T): Promise<void> {
+  const kv = getKvConfig();
+  const key = kvKeyForFile(filePath);
+
+  if (kv && key) {
+    await kvCommand<string>(kv, ["SET", key, JSON.stringify(value)]);
+    return;
+  }
+
+  if (isVercelReadonlyRuntime()) {
+    throw missingProductionStorageError();
+  }
+
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, JSON.stringify(value, null, 2), "utf8");
 }
 
 async function backupCatalog(reason: string): Promise<void> {
+  // Backups only run when we can actually write to the local filesystem.
+  // On Vercel/Lambda the deployment dir is read-only; KV-mode persistence
+  // doesn't keep per-write history, which is an acceptable trade-off here.
+  if (getKvConfig() || isVercelReadonlyRuntime()) return;
+
   try {
     const raw = await fs.readFile(CATALOG_FILE, "utf8");
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");
