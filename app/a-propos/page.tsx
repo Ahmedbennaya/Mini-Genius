@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "À propos",
   description:
     "Mini Genius accompagne les parents en Tunisie avec des jouets éducatifs sélectionnés avec soin pour soutenir l'apprentissage, la créativité et le développement des enfants.",
+  alternates: { canonical: "/a-propos" },
 };
 
 const VALUES = [

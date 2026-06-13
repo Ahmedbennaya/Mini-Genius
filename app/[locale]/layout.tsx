@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BrainCircuit, Gamepad2, LayoutDashboard, Store, Trophy } from "lucide-react";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 import {
+  DEFAULT_LOCALE,
   LOCALE_DIRECTION,
   SUPPORTED_LOCALES,
   isLocale,
@@ -13,6 +15,15 @@ import {
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((locale) => ({ locale }));
+}
+
+// Index only the default language of the IQ Room; the other languages stay
+// fully usable but are kept out of Google to avoid duplicate thin pages.
+export function generateMetadata({ params }: { params: { locale: string } }): Metadata {
+  const isDefault = params.locale === DEFAULT_LOCALE;
+  return {
+    robots: isDefault ? { index: true, follow: true } : { index: false, follow: true },
+  };
 }
 
 export default function IQLocaleLayout({

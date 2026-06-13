@@ -14,6 +14,11 @@ import JsonLd from "@/components/seo/JsonLd";
 import { faqSchema } from "@/lib/seo/structured-data";
 import { HOME_FAQS } from "@/data/faq";
 import { listCollections } from "@/lib/admin/storage";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

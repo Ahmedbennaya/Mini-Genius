@@ -69,7 +69,9 @@ export const metadata: Metadata = {
   verification: {
     google: "8vkwXJjdctB5KqQln7cx9PANRqTfxoNmozIR3E8h8to",
   },
-  alternates: { canonical: "/" },
+  // NOTE: no global canonical here — a site-wide canonical: "/" would make
+  // every page declare itself a duplicate of the homepage. Each page sets its
+  // own canonical (or self-canonicalizes when none is set).
   robots: { index: true, follow: true },
 };
 

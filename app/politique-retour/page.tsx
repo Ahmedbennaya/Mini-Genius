@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Politique de retour",
   description:
     "Consultez les conditions de retour, d'echange et de remboursement de Mini Genius pour vos commandes de jouets educatifs en Tunisie.",
+  alternates: { canonical: "/politique-retour" },
 };
 
 const RETURN_STEPS = [
