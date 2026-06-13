@@ -13,6 +13,7 @@ const PRODUCTS = [
     color: "var(--mint)",
     accent: "var(--mint-deep)",
     shape: "puzzle",
+    image: "public/images/age-3-5.jpg",
     isNew: true,
   },
   {
@@ -27,6 +28,7 @@ const PRODUCTS = [
     color: "var(--butter)",
     accent: "var(--butter-deep)",
     shape: "cube",
+    image: "public/images/age-3-5.jpg",
   },
   {
     id: "blocs-magnetiques",
@@ -40,6 +42,7 @@ const PRODUCTS = [
     color: "var(--sky)",
     accent: "var(--sky-deep)",
     shape: "blocks",
+    image: "public/images/age-6-8.jpg",
     bestseller: true,
   },
   {
@@ -54,6 +57,7 @@ const PRODUCTS = [
     color: "var(--coral)",
     accent: "var(--coral-deep)",
     shape: "board",
+    image: "public/images/age-1-2.jpg",
   },
   {
     id: "tri-couleurs",
@@ -67,6 +71,7 @@ const PRODUCTS = [
     color: "var(--lavender)",
     accent: "var(--lavender-deep)",
     shape: "balls",
+    image: "public/images/age-3-5.jpg",
   },
   {
     id: "kit-stem",
@@ -80,6 +85,7 @@ const PRODUCTS = [
     color: "var(--mint)",
     accent: "var(--mint-deep)",
     shape: "rocket",
+    image: "public/images/age-9-plus.jpg",
   },
   {
     id: "cartes-animaux",
@@ -93,6 +99,7 @@ const PRODUCTS = [
     color: "var(--butter)",
     accent: "var(--butter-deep)",
     shape: "cards",
+    image: "public/images/age-6-8.jpg",
   },
   {
     id: "coffret-cadeau",
@@ -106,6 +113,7 @@ const PRODUCTS = [
     color: "var(--coral)",
     accent: "var(--coral-deep)",
     shape: "gift",
+    image: "public/images/age-1-2.jpg",
     bestseller: true,
   },
 ];

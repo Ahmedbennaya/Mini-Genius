@@ -18,7 +18,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
-import { allProducts } from "@/data/products";
+import { allProducts, type Product } from "@/data/products";
 import { PALETTE_HEX } from "@/data/site";
 import ToyVisual from "@/components/ui/ToyVisual";
 import { formatTND } from "@/lib/utils";
@@ -60,16 +60,17 @@ const INITIAL: FormState = {
 export default function CheckoutPage() {
   const { lines, clear } = useCart();
   const checkoutTrackedRef = useRef(false);
+  const [products, setProducts] = useState<Product[]>(allProducts);
 
   const items = useMemo(
     () =>
       lines
         .map((l) => {
-          const product = allProducts.find((p) => p.id === l.id);
+          const product = products.find((p) => p.id === l.id);
           return product ? { product, qty: l.qty } : null;
         })
-        .filter(Boolean) as { product: (typeof allProducts)[number]; qty: number }[],
-    [lines]
+        .filter(Boolean) as { product: Product; qty: number }[],
+    [lines, products]
   );
 
   const subtotal = items.reduce((s, it) => s + it.product.price * it.qty, 0);
@@ -79,6 +80,21 @@ export default function CheckoutPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
+
+  useEffect(() => {
+    let ignore = false;
+
+    fetch("/api/products", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((result: { ok?: boolean; data?: Product[] }) => {
+        if (!ignore && result.ok && result.data) setProducts(result.data);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const deliveryDef =
     DELIVERY_OPTIONS.find((d) => d.id === form.delivery) ?? DELIVERY_OPTIONS[0];
@@ -283,7 +299,7 @@ export default function CheckoutPage() {
               value={form.phone}
               onChange={(v) => setField("phone", v)}
               error={errors.phone}
-              placeholder="+216 00 000 000"
+              placeholder="+216 52 338 194"
               autoComplete="tel"
               icon={<Phone size={16} />}
             />

@@ -2,7 +2,12 @@ import Link from "next/link";
 import { Instagram, Facebook, MessageCircle, Truck, Phone, Mail, ShieldCheck } from "lucide-react";
 import Logo from "./Logo";
 import Reveal from "@/components/motion/Reveal";
-import { whatsappOrderLink } from "@/lib/utils";
+import {
+  FACEBOOK_URL,
+  INSTAGRAM_URL,
+  SUPPORT_PHONE_DISPLAY,
+  whatsappOrderLink,
+} from "@/lib/utils";
 
 const COLS = [
   {
@@ -48,10 +53,10 @@ export default function Footer() {
               Apprendre en jouant, en toute confiance.
             </p>
             <div className="mt-6 flex items-center gap-2">
-              <SocialLink href="https://instagram.com" label="Instagram">
+              <SocialLink href={INSTAGRAM_URL} label="Instagram">
                 <Instagram size={18} />
               </SocialLink>
-              <SocialLink href="https://facebook.com" label="Facebook">
+              <SocialLink href={FACEBOOK_URL} label="Facebook">
                 <Facebook size={18} />
               </SocialLink>
               <SocialLink href={whatsappOrderLink()} label="WhatsApp">
@@ -87,7 +92,7 @@ export default function Footer() {
         <div className="mt-10 flex flex-col items-start justify-between gap-4 border-t border-cream-300 pt-6 text-sm text-ink-soft sm:flex-row sm:items-center">
           <p>© {new Date().getFullYear()} Mini Genius. Tous droits réservés.</p>
           <p className="flex items-center gap-2">
-            <Mail size={14} /> bonjour@minigenius.tn · <Phone size={14} /> +216 00 000 000
+            <Mail size={14} /> bonjour@minigenius.tn · <Phone size={14} /> {SUPPORT_PHONE_DISPLAY}
           </p>
         </div>
       </div>

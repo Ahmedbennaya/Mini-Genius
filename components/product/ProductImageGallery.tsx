@@ -4,7 +4,12 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
-import { getProductImageFrame, getProductImages, type Product } from "@/data/products";
+import {
+  getProductImageFrame,
+  getProductImagePosition,
+  getProductImages,
+  type Product,
+} from "@/data/products";
 import { PALETTE_HEX } from "@/data/site";
 import ToyVisual from "@/components/ui/ToyVisual";
 import { cn } from "@/lib/utils";
@@ -24,6 +29,7 @@ export default function ProductImageGallery({ product }: ProductImageGalleryProp
   const usableImages = images.filter((image) => !failed[image]);
   const image = usableImages[active] || usableImages[0];
   const imageFrame = getProductImageFrame(product);
+  const imagePosition = getProductImagePosition(product);
   const tint = PALETTE_HEX[product.palette];
   const hasMultiple = usableImages.length > 1;
 
@@ -75,6 +81,7 @@ export default function ProductImageGallery({ product }: ProductImageGalleryProp
                   "transition duration-700 ease-out lg:hover:scale-[1.035]",
                   imageFrame.fit === "contain" ? "object-contain p-5" : "object-cover"
                 )}
+                style={{ objectPosition: imagePosition.objectPosition }}
                 onError={() => {
                   setFailed((current) => ({ ...current, [image]: true }));
                   setActive(0);

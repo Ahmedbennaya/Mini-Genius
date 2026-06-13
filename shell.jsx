@@ -85,7 +85,7 @@ function Header({ cartCount, onOpenMenu }) {
                 }}>{cartCount}</span>
               )}
             </button>
-            <a className="btn btn-whatsapp btn-sm hide-mobile" href="https://wa.me/21600000000" target="_blank" rel="noopener" style={{ marginLeft:6 }}>
+            <a className="btn btn-whatsapp btn-sm hide-mobile" href="https://wa.me/21652338194" target="_blank" rel="noopener" style={{ marginLeft:6 }}>
               <I.whatsapp size={16}/> WhatsApp
             </a>
             <button className="show-mobile" aria-label="Menu" style={iconBtn} onClick={onOpenMenu}><I.menu/></button>
@@ -154,7 +154,7 @@ function MobileMenu({ open, onClose }) {
           ))}
         </nav>
 
-        <a className="btn btn-whatsapp" href="https://wa.me/21600000000" target="_blank" rel="noopener" style={{ marginTop:12 }}>
+        <a className="btn btn-whatsapp" href="https://wa.me/21652338194" target="_blank" rel="noopener" style={{ marginTop:12 }}>
           <I.whatsapp/> Commander sur WhatsApp
         </a>
         <button className="btn btn-ghost" onClick={()=>{ window.MG_NAV.go("cart"); onClose(); }}>
@@ -238,7 +238,7 @@ function Footer() {
 
 function WhatsAppFAB() {
   return (
-    <a href="https://wa.me/21600000000" target="_blank" rel="noopener"
+    <a href="https://wa.me/21652338194" target="_blank" rel="noopener"
        aria-label="Commander sur WhatsApp"
        style={{
          position:"fixed", right:22, bottom:22, zIndex:60,

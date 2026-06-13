@@ -8,6 +8,7 @@ import ImageUploaderFields from "@/components/admin/ImageUploaderFields";
 import {
   getPrimaryProductImage,
   getProductImageFrame,
+  getProductImagePosition,
   getProductImages,
   type Product,
 } from "@/data/products";
@@ -58,6 +59,8 @@ export default function ProductForm({ mode, initial }: ProductFormProps) {
     imageFrameWidth: getProductImageFrame(initial || ({} as Product)).width,
     imageFrameHeight: getProductImageFrame(initial || ({} as Product)).height,
     imageFit: getProductImageFrame(initial || ({} as Product)).fit,
+    imagePositionX: getProductImagePosition(initial || ({} as Product)).x,
+    imagePositionY: getProductImagePosition(initial || ({} as Product)).y,
     age: initial?.age || "",
     ageMin: initial?.ageMin ?? 2,
     ageMax: initial?.ageMax ?? 6,
@@ -103,6 +106,8 @@ export default function ProductForm({ mode, initial }: ProductFormProps) {
       imageFrameWidth: Number(form.imageFrameWidth) || 1080,
       imageFrameHeight: Number(form.imageFrameHeight) || 1080,
       imageFit: form.imageFit,
+      imagePositionX: Number(form.imagePositionX),
+      imagePositionY: Number(form.imagePositionY),
       age: form.age,
       ageMin: Number(form.ageMin),
       ageMax: Number(form.ageMax),
@@ -272,6 +277,10 @@ export default function ProductForm({ mode, initial }: ProductFormProps) {
           onImageFrameHeightChange={(imageFrameHeight) => setForm((s) => ({ ...s, imageFrameHeight }))}
           imageFit={form.imageFit}
           onImageFitChange={(imageFit) => setForm((s) => ({ ...s, imageFit }))}
+          imagePositionX={form.imagePositionX}
+          onImagePositionXChange={(imagePositionX) => setForm((s) => ({ ...s, imagePositionX }))}
+          imagePositionY={form.imagePositionY}
+          onImagePositionYChange={(imagePositionY) => setForm((s) => ({ ...s, imagePositionY }))}
         />
       </div>
 
@@ -307,6 +316,7 @@ export default function ProductForm({ mode, initial }: ProductFormProps) {
 function PreviewCard({ product }: { product: Product }) {
   const image = getPrimaryProductImage(product);
   const imageFrame = getProductImageFrame(product);
+  const imagePosition = getProductImagePosition(product);
   const categoryName = CATEGORIES.find((category) => category.id === product.category)?.name || product.category;
 
   return (
@@ -318,6 +328,7 @@ function PreviewCard({ product }: { product: Product }) {
             src={image}
             alt=""
             className={`h-full w-full ${imageFrame.fit === "contain" ? "object-contain p-3" : "object-cover"}`}
+            style={{ objectPosition: imagePosition.objectPosition }}
           />
         ) : (
           <div className="flex h-full items-center justify-center text-sm font-semibold text-slate-400">

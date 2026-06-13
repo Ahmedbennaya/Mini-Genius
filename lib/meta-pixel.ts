@@ -1,5 +1,7 @@
 "use client";
 
+import { track } from "@/lib/analytics/track";
+
 export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "2015145739108049";
 export const META_CURRENCY = process.env.NEXT_PUBLIC_META_CURRENCY || "TND";
 
@@ -149,6 +151,50 @@ function postServerEvent(
   }).catch(() => undefined);
 }
 
+/**
+ * Mirror a Meta standard event onto GA4 / GTM / TikTok via the shared dispatch.
+ * Keeps a single source of truth: every existing Meta event call site
+ * automatically reaches the other platforms with no extra code, and each
+ * platform receives the event exactly once (no duplication).
+ */
+const GA4_EVENT_MAP: Record<MetaStandardEvent, string | null> = {
+  PageView: null, // handled by the GA/GTM page_view, not here
+  ViewContent: "view_item",
+  Search: "search",
+  AddToWishlist: "add_to_wishlist",
+  AddToCart: "add_to_cart",
+  InitiateCheckout: "begin_checkout",
+  Contact: "contact",
+  Purchase: "purchase",
+};
+
+function bridgeToAnalytics(eventName: MetaStandardEvent, customData: MetaCustomData) {
+  const ga4Name = GA4_EVENT_MAP[eventName];
+  if (!ga4Name) return;
+
+  const params: Record<string, unknown> = {};
+  if (customData.currency) params.currency = customData.currency;
+  if (typeof customData.value === "number") params.value = customData.value;
+  if (customData.order_id) params.transaction_id = customData.order_id;
+  if (customData.search_string) params.search_term = customData.search_string;
+  if (customData.content_name) params.content_name = customData.content_name;
+  if (eventName === "Contact" && customData.content_name) {
+    params.method = customData.content_name;
+  }
+
+  if (customData.contents && customData.contents.length > 0) {
+    params.items = customData.contents.map((item, index) => ({
+      item_id: item.id,
+      item_name: index === 0 ? customData.content_name : undefined,
+      item_category: customData.content_category,
+      price: item.item_price,
+      quantity: item.quantity,
+    }));
+  }
+
+  track(ga4Name, params);
+}
+
 export function trackMetaEvent(
   eventName: MetaStandardEvent,
   customData: MetaCustomData = {},
@@ -163,6 +209,8 @@ export function trackMetaEvent(
   if (options.sendToServer) {
     postServerEvent(eventName, eventId, customData);
   }
+
+  bridgeToAnalytics(eventName, customData);
 
   return eventId;
 }

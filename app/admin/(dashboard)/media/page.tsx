@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ImagePlus, Images, Save, Trash2, TriangleAlert } from "lucide-react";
 import AdminCard from "@/components/admin/AdminCard";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
@@ -12,7 +12,13 @@ import StatusBadge from "@/components/admin/StatusBadge";
 import Toast from "@/components/admin/Toast";
 import mediaData from "@/data/admin/media.json";
 import catalog from "@/data/catalog.json";
-import { getProductImageFrame, getProductImages, normalizeProducts, type Product } from "@/data/products";
+import {
+  getProductImageFrame,
+  getProductImagePosition,
+  getProductImages,
+  normalizeProducts,
+  type Product,
+} from "@/data/products";
 import type { MediaAsset } from "@/lib/admin/types";
 
 export default function MediaPage() {
@@ -23,6 +29,21 @@ export default function MediaPage() {
   const [form, setForm] = useState({ name: "", url: "", kind: "image" as "image" | "video" });
   const [toast, setToast] = useState<string | null>(null);
   const [toastTone, setToastTone] = useState<"success" | "error">("success");
+
+  useEffect(() => {
+    let ignore = false;
+
+    fetch("/api/admin/products", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((result: { ok?: boolean; data?: Product[] }) => {
+        if (!ignore && result.ok && result.data) setProducts(result.data);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const filteredProducts = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -227,6 +248,7 @@ function ProductMediaEditor({
 }) {
   const images = getProductImages(product);
   const imageFrame = getProductImageFrame(product);
+  const imagePosition = getProductImagePosition(product);
   const missing = images.length === 0;
 
   return (
@@ -264,6 +286,10 @@ function ProductMediaEditor({
         onImageFrameHeightChange={(imageFrameHeight) => onChange({ imageFrameHeight })}
         imageFit={imageFrame.fit}
         onImageFitChange={(imageFit) => onChange({ imageFit })}
+        imagePositionX={imagePosition.x}
+        onImagePositionXChange={(imagePositionX) => onChange({ imagePositionX })}
+        imagePositionY={imagePosition.y}
+        onImagePositionYChange={(imagePositionY) => onChange({ imagePositionY })}
       />
     </section>
   );

@@ -27,6 +27,8 @@ export type Product = {
   imageFrameWidth?: number;
   imageFrameHeight?: number;
   imageFit?: ProductImageFit;
+  imagePositionX?: number;
+  imagePositionY?: number;
   age: string;
   ageMin: number;
   ageMax: number;
@@ -82,6 +84,12 @@ function normalizeDimension(value: unknown, fallback: number) {
   return Math.min(4000, Math.max(240, Math.round(number)));
 }
 
+function normalizePercent(value: unknown, fallback = 50) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(100, Math.max(0, Math.round(number)));
+}
+
 export function getProductImageFrame(
   product: Pick<Product, "imageFrameWidth" | "imageFrameHeight" | "imageFit">
 ) {
@@ -94,6 +102,19 @@ export function getProductImageFrame(
     height,
     fit,
     aspectRatio: `${width} / ${height}`,
+  };
+}
+
+export function getProductImagePosition(
+  product: Pick<Product, "imagePositionX" | "imagePositionY">
+) {
+  const x = normalizePercent(product.imagePositionX, 50);
+  const y = normalizePercent(product.imagePositionY, 50);
+
+  return {
+    x,
+    y,
+    objectPosition: `${x}% ${y}%`,
   };
 }
 

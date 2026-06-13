@@ -2,18 +2,28 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight, Truck, ShieldCheck, Sparkles, Star, Check } from "lucide-react";
-import { PRODUCTS, getPrimaryProductImage, getProduct, getRelated } from "@/data/products";
+import { getPrimaryProductImage, type Product } from "@/data/products";
 import ProductImageGallery from "@/components/product/ProductImageGallery";
 import AddToCartActions from "@/components/product/AddToCartActions";
 import ProductCard from "@/components/product/ProductCard";
 import ProductViewTracker from "@/components/analytics/ProductViewTracker";
+import JsonLd from "@/components/seo/JsonLd";
+import { breadcrumbSchema, productSchema } from "@/lib/seo/structured-data";
 import Stars from "@/components/ui/Stars";
 import { formatTND } from "@/lib/utils";
 import { CATEGORIES } from "@/data/site";
 import Reveal from "@/components/motion/Reveal";
+import { listProducts } from "@/lib/admin/storage";
 
-export async function generateStaticParams() {
-  return PRODUCTS.map((p) => ({ slug: p.slug }));
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+function getRelatedProducts(products: Product[], product: Product, limit = 4) {
+  return products
+    .filter((p) => p.id !== product.id && p.category === product.category)
+    .slice(0, limit)
+    .concat(products.filter((p) => p.id !== product.id && p.category !== product.category))
+    .slice(0, limit);
 }
 
 export async function generateMetadata({
@@ -21,12 +31,15 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const product = getProduct(params.slug);
+  const products = await listProducts();
+  const product = products.find((item) => item.slug === params.slug);
   if (!product) return { title: "Produit introuvable" };
   return {
     title: product.name,
     description: `${product.benefit}. ${product.description.slice(0, 140)}`,
+    alternates: { canonical: `/produit/${product.slug}` },
     openGraph: {
+      type: "website",
       title: product.name,
       description: product.benefit,
       images: getPrimaryProductImage(product) ? [getPrimaryProductImage(product)!] : undefined,
@@ -34,16 +47,28 @@ export async function generateMetadata({
   };
 }
 
-export default function ProductDetailPage({ params }: { params: { slug: string } }) {
-  const product = getProduct(params.slug);
+export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
+  const products = await listProducts();
+  const product = products.find((item) => item.slug === params.slug);
   if (!product) notFound();
 
-  const related = getRelated(product, 4);
+  const related = getRelatedProducts(products, product, 4);
   const catName = CATEGORIES.find((c) => c.id === product.category)?.name ?? "Collection";
 
   return (
     <div className="container-mg py-10 sm:py-14">
       <ProductViewTracker product={product} />
+      <JsonLd
+        data={[
+          productSchema(product, catName),
+          breadcrumbSchema([
+            { name: "Accueil", url: "/" },
+            { name: "Collection", url: "/collection" },
+            { name: catName, url: `/collection?cat=${product.category}` },
+            { name: product.name, url: `/produit/${product.slug}` },
+          ]),
+        ]}
+      />
 
       {/* Breadcrumb */}
       <Reveal

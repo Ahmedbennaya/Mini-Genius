@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Script from "next/script";
 import { META_PIXEL_ID } from "@/lib/meta-pixel";
+import { CONSENT_COOKIE, CONSENT_DEFAULT } from "@/lib/analytics/config";
 
 export default function MetaPixel() {
   const pathname = usePathname();
@@ -35,6 +36,7 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
+(function(){var m=document.cookie.match(/(?:^|; )${CONSENT_COOKIE}=([^;]+)/);var c=m?decodeURIComponent(m[1]):'${CONSENT_DEFAULT}';if(c!=='granted'){fbq('consent','revoke');}})();
 fbq('init', '${META_PIXEL_ID}');
 fbq('track', 'PageView');
 `,

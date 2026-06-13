@@ -13,6 +13,14 @@ function CollectionPage({ initialState, onAdd }) {
   const [maxPrice, setMaxPrice] = useStateP(250);
   const [sort, setSort] = useStateP("popular");
   const [drawerOpen, setDrawerOpen] = useStateP(false);
+  const [columns, setColumns] = useStateP(() => {
+    const saved = Number(window.localStorage?.getItem("mgCollectionColumns") || 3);
+    return [1, 2, 3, 5].includes(saved) ? saved : 3;
+  });
+
+  useEffectP(() => {
+    window.localStorage?.setItem("mgCollectionColumns", String(columns));
+  }, [columns]);
 
   const filtered = useMemo(() => {
     let list = [...products];
@@ -93,7 +101,22 @@ function CollectionPage({ initialState, onAdd }) {
               <button className="btn btn-ghost btn-sm show-mobile" onClick={()=>setDrawerOpen(true)}>
                 <I.filter/> Filtres
               </button>
-              <div style={{ display:"flex", alignItems:"center", gap:10, marginLeft:"auto" }}>
+              <div className="view-switcher" role="group" aria-label="Produits par ligne">
+                <span>Vue</span>
+                {[1, 2, 3, 5].map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    className={columns === value ? "active" : ""}
+                    onClick={() => setColumns(value)}
+                    aria-pressed={columns === value}
+                    aria-label={`${value} produit${value > 1 ? "s" : ""} par ligne`}
+                  >
+                    {value}
+                  </button>
+                ))}
+              </div>
+              <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                 <span style={{ fontSize:13, color:"var(--ink-3)" }}>Trier par</span>
                 <select value={sort} onChange={(e)=>setSort(e.target.value)} style={{
                   padding:"10px 14px", borderRadius:"var(--r-pill)", border:"1px solid var(--line)",
@@ -116,7 +139,10 @@ function CollectionPage({ initialState, onAdd }) {
                 <p style={{ color:"var(--ink-2)", marginTop:8 }}>Essayez d'élargir vos filtres.</p>
               </div>
             ) : (
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:18 }} className="col-products">
+              <div
+                style={{ display:"grid", gridTemplateColumns:`repeat(${columns}, minmax(0, 1fr))`, gap: columns === 5 ? 12 : 18 }}
+                className={`col-products col-products-${columns}`}
+              >
                 {filtered.map(p => <ProductCard key={p.id} p={p} onAdd={onAdd}/>)}
               </div>
             )}
@@ -152,10 +178,10 @@ function CollectionPage({ initialState, onAdd }) {
         @media (max-width: 900px) {
           .col-grid { grid-template-columns: 1fr !important; }
           .col-sidebar { display: none !important; }
-          .col-products { grid-template-columns: repeat(2, 1fr) !important; }
+          .col-products:not(.col-products-1) { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 480px) { .col-products { grid-template-columns: 1fr !important; } }
-        @media (max-width: 1100px) { .col-products { grid-template-columns: repeat(2, 1fr) !important; } }
+        @media (max-width: 1100px) { .col-products:not(.col-products-1) { grid-template-columns: repeat(2, 1fr) !important; } }
       `}</style>
     </section>
   );
@@ -247,7 +273,7 @@ function ProductPage({ id, onAdd }) {
                   <I.cart size={16}/> Ajouter au panier
                 </button>
               </div>
-              <a className="btn btn-whatsapp btn-lg" href="https://wa.me/21600000000" target="_blank" rel="noopener" style={{ width:"100%", marginTop:10 }}>
+              <a className="btn btn-whatsapp btn-lg" href="https://wa.me/21652338194" target="_blank" rel="noopener" style={{ width:"100%", marginTop:10 }}>
                 <I.whatsapp size={18}/> Commander sur WhatsApp
               </a>
 
@@ -346,7 +372,7 @@ function ProductPage({ id, onAdd }) {
           <div style={{ fontWeight:700, fontSize:18 }}>{p.price} <span style={{ fontSize:11, color:"var(--ink-3)" }}>TND</span></div>
         </div>
         <button className="btn btn-primary" style={{ flex:1 }} onClick={()=>onAdd(p, qty)}>Ajouter</button>
-        <a className="btn btn-whatsapp" href="https://wa.me/21600000000" target="_blank" rel="noopener" aria-label="WhatsApp" style={{ width:46, padding:0, height:46 }}>
+        <a className="btn btn-whatsapp" href="https://wa.me/21652338194" target="_blank" rel="noopener" aria-label="WhatsApp" style={{ width:46, padding:0, height:46 }}>
           <I.whatsapp size={18}/>
         </a>
       </div>
@@ -438,7 +464,7 @@ function CartPage({ cart, setCart, onAdd }) {
               <button className="btn btn-primary btn-lg" style={{ width:"100%", marginTop:20 }}>
                 Passer commande <I.arrow size={16}/>
               </button>
-              <a className="btn btn-whatsapp" href="https://wa.me/21600000000" target="_blank" rel="noopener" style={{ width:"100%", marginTop:10 }}>
+              <a className="btn btn-whatsapp" href="https://wa.me/21652338194" target="_blank" rel="noopener" style={{ width:"100%", marginTop:10 }}>
                 <I.whatsapp size={16}/> Commander sur WhatsApp
               </a>
               <div style={{ marginTop:18, padding:"12px 14px", borderRadius:"var(--r-md)", background:"var(--bg-2)", fontSize:13, color:"var(--ink-2)", display:"flex", gap:10 }}>
@@ -547,7 +573,7 @@ function ContactPage() {
             </p>
 
             <div style={{ marginTop:36, display:"flex", flexDirection:"column", gap:14 }}>
-              <ContactRow icon={I.whatsapp} title="WhatsApp" value="+216 00 000 000" hint="Réponse en moins de 30 min — 7j/7"/>
+              <ContactRow icon={I.whatsapp} title="WhatsApp" value="+216 52 338 194" hint="Réponse en moins de 30 min — 7j/7"/>
               <ContactRow icon={I.chat} title="Email" value="bonjour@minigenius.tn" hint="Réponse sous 24h"/>
               <ContactRow icon={I.truck} title="Livraison" value="24–72h partout en Tunisie" hint="Paiement à la livraison disponible"/>
             </div>

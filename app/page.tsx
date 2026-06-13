@@ -10,15 +10,20 @@ import Testimonials from "@/components/home/Testimonials";
 import GiftBoxSection from "@/components/home/GiftBoxSection";
 import FAQ from "@/components/home/FAQ";
 import Reveal from "@/components/motion/Reveal";
+import JsonLd from "@/components/seo/JsonLd";
+import { faqSchema } from "@/lib/seo/structured-data";
+import { HOME_FAQS } from "@/data/faq";
 import { listCollections } from "@/lib/admin/storage";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function HomePage() {
   const collections = await listCollections();
 
   return (
     <>
+      <JsonLd data={faqSchema(HOME_FAQS)} />
       <Hero />
       <Reveal>
         <TrustBadges />

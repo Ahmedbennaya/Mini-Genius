@@ -6,35 +6,11 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { whatsappOrderLink } from "@/lib/utils";
+import { HOME_FAQS, type FaqItem } from "@/data/faq";
 
-type QA = { q: string; a: string };
+type QA = FaqItem;
 
-const FAQS: QA[] = [
-  {
-    q: "Les jouets sont-ils sûrs pour les enfants ?",
-    a: "Tous nos jouets sont sélectionnés selon des critères stricts : matériaux non toxiques, finitions soignées et âge minimum recommandé clairement indiqué sur chaque fiche produit.",
-  },
-  {
-    q: "Comment choisir un jouet adapté à l'âge de mon enfant ?",
-    a: "Utilisez le filtre « par âge » sur la collection. Chaque produit affiche aussi la tranche d'âge recommandée et les compétences qu'il développe (logique, motricité, créativité…).",
-  },
-  {
-    q: "Quels sont les délais de livraison en Tunisie ?",
-    a: "Livraison partout en Tunisie en 24 à 72 heures selon la région. Vous recevez un suivi par WhatsApp dès l'expédition.",
-  },
-  {
-    q: "Puis-je payer à la livraison ?",
-    a: "Oui — le paiement à la livraison est disponible partout en Tunisie. Vous payez uniquement à la réception, en espèces.",
-  },
-  {
-    q: "Avez-vous des coffrets cadeaux ?",
-    a: "Oui, nos coffrets sont prêts à offrir, avec emballage soigné. Idéal pour anniversaire, naissance ou occasion spéciale.",
-  },
-  {
-    q: "Comment vous contacter rapidement ?",
-    a: "Nous sommes joignables 7j/7 par WhatsApp. Notre équipe répond habituellement en quelques minutes.",
-  },
-];
+const FAQS = HOME_FAQS;
 
 export default function FAQ() {
   return (

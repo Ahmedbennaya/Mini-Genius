@@ -6,7 +6,11 @@ export function formatTND(value: number) {
   return `${value.toFixed(0)} TND`;
 }
 
-export const WHATSAPP_NUMBER = "21600000000";
+export const SUPPORT_PHONE_DISPLAY = "+216 52 338 194";
+export const SUPPORT_PHONE_TEL = "+21652338194";
+export const WHATSAPP_NUMBER = "21652338194";
+export const INSTAGRAM_URL = "https://www.instagram.com/minigenius2036/";
+export const FACEBOOK_URL = "https://www.facebook.com/MiniGeniusTunisie";
 
 export function whatsappOrderLink(productName?: string) {
   const base = `https://wa.me/${WHATSAPP_NUMBER}`;

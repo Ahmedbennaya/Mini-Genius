@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowDownAZ,
   Copy,
@@ -50,6 +50,21 @@ export default function AdminProductsPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [toastTone, setToastTone] = useState<"success" | "error">("success");
   const importRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let ignore = false;
+
+    fetch("/api/admin/products", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((result: { ok?: boolean; data?: Product[] }) => {
+        if (!ignore && result.ok && result.data) setProducts(result.data);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

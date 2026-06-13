@@ -130,7 +130,7 @@ lib/
 
 ## Configuration
 
-- **WhatsApp number**: edit `WHATSAPP_NUMBER` in `lib/utils.ts` (currently the placeholder `21600000000`).
+- **WhatsApp number**: edit `WHATSAPP_NUMBER` in `lib/utils.ts`.
 - **Site URL** for SEO: edit `metadataBase` in `app/layout.tsx`.
 - **Products**: edit `data/products.ts` — typed `Product[]`. The `ToyVisual` palette + shape combination is what renders the visual.
 - **Categories / ages / testimonials / trust badges / benefits**: `data/site.ts`.

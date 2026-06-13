@@ -1,7 +1,19 @@
 "use client";
 
-import { ArrowDown, ArrowUp, Copy, ImageIcon, Search, Sparkles, Trash2 } from "lucide-react";
-import { useState } from "react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Copy,
+  ImageIcon,
+  Loader2,
+  Move,
+  RotateCcw,
+  Search,
+  Sparkles,
+  Trash2,
+  UploadCloud,
+} from "lucide-react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 type ImageUploaderFieldsProps = {
@@ -17,9 +29,14 @@ type ImageUploaderFieldsProps = {
   onImageFrameHeightChange: (value: number) => void;
   imageFit: "cover" | "contain";
   onImageFitChange: (value: "cover" | "contain") => void;
+  imagePositionX: number;
+  onImagePositionXChange: (value: number) => void;
+  imagePositionY: number;
+  onImagePositionYChange: (value: number) => void;
 };
 
 const MAX_IMAGES = 5;
+const MAX_IMAGE_SIDE = 1600;
 
 export default function ImageUploaderFields({
   images,
@@ -34,9 +51,18 @@ export default function ImageUploaderFields({
   onImageFrameHeightChange,
   imageFit,
   onImageFitChange,
+  imagePositionX,
+  onImagePositionXChange,
+  imagePositionY,
+  onImagePositionYChange,
 }: ImageUploaderFieldsProps) {
   const [copied, setCopied] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const slots = Array.from({ length: MAX_IMAGES }, (_, index) => images[index] || "");
+  const primaryImage = images[0] || "";
+  const canAddImages = images.length < MAX_IMAGES;
 
   function updateImage(index: number, value: string) {
     const next = [...slots];
@@ -56,6 +82,77 @@ export default function ImageUploaderFields({
     const [item] = next.splice(index, 1);
     next.splice(nextIndex, 0, item);
     onImagesChange(next.slice(0, MAX_IMAGES));
+  }
+
+  function clampPercent(value: number) {
+    return Math.min(100, Math.max(0, Math.round(value)));
+  }
+
+  function readFileAsDataUrl(file: File) {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => reject(reader.error || new Error("Lecture image impossible"));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function optimizeImageFile(file: File) {
+    const source = await readFileAsDataUrl(file);
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Image invalide"));
+      img.src = source;
+    });
+
+    const width = image.naturalWidth || image.width;
+    const height = image.naturalHeight || image.height;
+    const scale = Math.min(1, MAX_IMAGE_SIDE / Math.max(width, height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(width * scale));
+    canvas.height = Math.max(1, Math.round(height * scale));
+
+    const context = canvas.getContext("2d");
+    if (!context) return source;
+
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    return canvas.toDataURL("image/webp", 0.86);
+  }
+
+  async function addFiles(fileList: FileList | File[]) {
+    const room = MAX_IMAGES - images.length;
+    if (room <= 0) return;
+
+    const files = Array.from(fileList)
+      .filter((file) => file.type.startsWith("image/"))
+      .slice(0, room);
+
+    if (files.length === 0) return;
+
+    setUploading(true);
+    try {
+      const nextImages = [];
+      for (const file of files) {
+        nextImages.push(await optimizeImageFile(file));
+      }
+      onImagesChange([...images, ...nextImages].slice(0, MAX_IMAGES));
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  function updatePositionFromPointer(event: React.PointerEvent<HTMLDivElement>) {
+    if (!primaryImage) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    onImagePositionXChange(clampPercent(x));
+    onImagePositionYChange(clampPercent(y));
   }
 
   async function copyPrompt() {
@@ -159,6 +256,135 @@ export default function ImageUploaderFields({
             </button>
           ))}
         </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_250px]">
+          <div>
+            <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.04em] text-slate-500">
+              <Move size={14} />
+              Position image
+            </div>
+            <div
+              className={cn(
+                "relative flex min-h-[220px] items-center justify-center overflow-hidden rounded-2xl border bg-slate-100",
+                primaryImage ? "cursor-move border-slate-200" : "border-dashed border-slate-300"
+              )}
+              style={{
+                aspectRatio: `${imageFrameWidth} / ${imageFrameHeight}`,
+                maxHeight: 360,
+              }}
+              onPointerDown={(event) => {
+                event.currentTarget.setPointerCapture(event.pointerId);
+                updatePositionFromPointer(event);
+              }}
+              onPointerMove={(event) => {
+                if (event.buttons === 1) updatePositionFromPointer(event);
+              }}
+            >
+              {primaryImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={primaryImage}
+                  alt=""
+                  draggable={false}
+                  className={cn(
+                    "h-full w-full select-none",
+                    imageFit === "contain" ? "object-contain p-4" : "object-cover"
+                  )}
+                  style={{ objectPosition: `${imagePositionX}% ${imagePositionY}%` }}
+                />
+              ) : (
+                <ImageIcon size={34} className="text-slate-300" />
+              )}
+              {primaryImage ? (
+                <span
+                  className="pointer-events-none absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-coral-deep shadow-soft"
+                  style={{ left: `${imagePositionX}%`, top: `${imagePositionY}%` }}
+                />
+              ) : null}
+            </div>
+          </div>
+
+          <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.04em] text-slate-500">
+                X {imagePositionX}%
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={imagePositionX}
+                onChange={(event) => onImagePositionXChange(Number(event.target.value))}
+                className="w-full accent-coral-deep"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.04em] text-slate-500">
+                Y {imagePositionY}%
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={imagePositionY}
+                onChange={(event) => onImagePositionYChange(Number(event.target.value))}
+                className="w-full accent-coral-deep"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => {
+                onImagePositionXChange(50);
+                onImagePositionYChange(50);
+              }}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
+            >
+              <RotateCcw size={14} />
+              Centrer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "mt-4 rounded-3xl border border-dashed bg-white p-5 text-center transition",
+          dragActive ? "border-coral-deep bg-coral/10" : "border-slate-300",
+          !canAddImages && "opacity-55"
+        )}
+        onDragOver={(event) => {
+          event.preventDefault();
+          setDragActive(true);
+        }}
+        onDragLeave={() => setDragActive(false)}
+        onDrop={(event) => {
+          event.preventDefault();
+          setDragActive(false);
+          void addFiles(event.dataTransfer.files);
+        }}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(event) => {
+            if (event.target.files) void addFiles(event.target.files);
+          }}
+        />
+        <button
+          type="button"
+          disabled={!canAddImages || uploading}
+          onClick={() => fileInputRef.current?.click()}
+          className="mx-auto inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-bold text-white shadow-soft transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-55"
+        >
+          {uploading ? <Loader2 size={17} className="animate-spin" /> : <UploadCloud size={17} />}
+          {uploading ? "Import..." : "Glisser ou choisir images"}
+        </button>
+        <p className="mt-2 text-xs font-semibold text-slate-500">
+          JPG, PNG ou WebP. Compression auto avant sauvegarde.
+        </p>
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_280px]">
@@ -166,13 +392,13 @@ export default function ImageUploaderFields({
           {slots.map((value, index) => (
             <label key={index} className="block">
               <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.04em] text-slate-500">
-                Image {index + 1} URL
+                Image {index + 1}
               </span>
               <div className="flex gap-2">
                 <input
                   value={value}
                   onChange={(event) => updateImage(index, event.target.value)}
-                  placeholder="https://..."
+                  placeholder="https://... ou image importee"
                   className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none ring-coral-deep/15 transition focus:border-coral-deep/60 focus:ring-4"
                 />
                 <button
@@ -218,7 +444,12 @@ export default function ImageUploaderFields({
             >
               {value ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={value} alt="" className="h-full w-full object-cover" />
+                <img
+                  src={value}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  style={{ objectPosition: `${imagePositionX}% ${imagePositionY}%` }}
+                />
               ) : (
                 <div className="flex h-full items-center justify-center text-slate-300">
                   <ImageIcon size={22} />

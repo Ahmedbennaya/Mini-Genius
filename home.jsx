@@ -264,7 +264,7 @@ function Categories() {
   );
 }
 
-function ProductCard({ p, onAdd }) {
+function ProductCardLegacy({ p, onAdd }) {
   const [adding, setAdding] = useStateH(false);
   return (
     <div className="card" style={{ padding:18, display:"flex", flexDirection:"column", gap:14 }}>
@@ -297,6 +297,75 @@ function ProductCard({ p, onAdd }) {
         </button>
       </div>
     </div>
+  );
+}
+
+function ProductCard({ p, onAdd }) {
+  const [adding, setAdding] = useStateH(false);
+  const [imageFailed, setImageFailed] = useStateH(false);
+  const hasImage = Boolean(p.image && !imageFailed);
+
+  return (
+    <article className="card product-card">
+      <button
+        type="button"
+        className="product-media"
+        style={{
+          background: `linear-gradient(160deg, ${p.color}, color-mix(in srgb, ${p.color} 72%, white))`,
+        }}
+        onClick={() => window.MG_NAV.go("product", { id: p.id })}
+        aria-label={`Voir ${p.name}`}
+      >
+        {p.isNew && <span className="product-badge">Nouveau</span>}
+        {p.bestseller && <span className="product-badge product-badge-dark">Best-seller</span>}
+        {hasImage ? (
+          <img
+            src={p.image}
+            alt={p.name}
+            className="product-img"
+            loading="lazy"
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <Toy3D shape={p.shape} color={p.color} accent={p.accent} size={132} />
+        )}
+      </button>
+
+      <div className="product-card-main">
+        <div className="product-meta">
+          <span className="pill product-age">{p.age}</span>
+          <span className="product-rating">
+            <I.star size={12} /> {p.rating} <span>({p.reviews})</span>
+          </span>
+        </div>
+
+        <button
+          type="button"
+          className="product-title"
+          onClick={() => window.MG_NAV.go("product", { id: p.id })}
+        >
+          {p.name}
+        </button>
+        <p className="product-benefit">{p.benefit}</p>
+
+        <div className="product-card-footer">
+          <div className="product-price">
+            {p.price} <span>TND</span>
+          </div>
+          <button
+            className={`btn btn-sm ${adding ? "btn-coral" : "btn-primary"} product-add`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setAdding(true);
+              onAdd(p);
+              setTimeout(() => setAdding(false), 1000);
+            }}
+          >
+            {adding ? <><I.check size={14} /> Ajoute</> : <><I.plus size={14} /> Ajouter</>}
+          </button>
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -413,7 +482,7 @@ function GiftBox() {
               <button className="btn btn-primary btn-lg" onClick={()=>window.MG_NAV.go("collection",{category:"cadeaux"})}>
                 Trouver le cadeau parfait <I.arrow size={16}/>
               </button>
-              <a className="btn btn-ghost btn-lg" href="https://wa.me/21600000000" target="_blank" rel="noopener">
+              <a className="btn btn-ghost btn-lg" href="https://wa.me/21652338194" target="_blank" rel="noopener">
                 <I.whatsapp size={16}/> Conseil personnalisé
               </a>
             </div>

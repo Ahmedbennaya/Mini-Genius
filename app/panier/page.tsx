@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { ShoppingBag, MessageCircle, Truck, ArrowRight, Tag, CreditCard } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { allProducts, type Product } from "@/data/products";
@@ -10,16 +11,32 @@ import { formatTND, whatsappOrderLink } from "@/lib/utils";
 
 export default function CartPage() {
   const { lines, count, clear } = useCart();
+  const [products, setProducts] = useState<Product[]>(allProducts);
+
+  useEffect(() => {
+    let ignore = false;
+
+    fetch("/api/products", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((result: { ok?: boolean; data?: Product[] }) => {
+        if (!ignore && result.ok && result.data) setProducts(result.data);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const items = lines
     .map((l) => {
-      const product = allProducts.find((p) => p.id === l.id);
+      const product = products.find((p) => p.id === l.id);
       return product ? { product, qty: l.qty } : null;
     })
     .filter(Boolean) as { product: Product; qty: number }[];
 
   const subtotal = items.reduce((s, l) => s + l.product.price * l.qty, 0);
-  const recommended = allProducts.filter((p) => !lines.find((l) => l.id === p.id)).slice(0, 4);
+  const recommended = products.filter((p) => !lines.find((l) => l.id === p.id)).slice(0, 4);
 
   if (items.length === 0) {
     return (

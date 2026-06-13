@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { GAMES } from "@/data/iq/games";
-import { PRODUCTS } from "@/data/products";
+import { listProducts } from "@/lib/admin/storage";
 import { SUPPORTED_LOCALES } from "@/lib/iq/i18n";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -14,7 +14,8 @@ const staticRoutes = [
   "/commande",
 ] as const;
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const products = await listProducts();
   const baseUrl = getSiteUrl();
   const now = new Date();
   const staticEntries: MetadataRoute.Sitemap = staticRoutes.map((path, index) => ({
@@ -24,7 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === "/" ? 1 : index === 1 ? 0.9 : 0.7,
   }));
 
-  const productEntries: MetadataRoute.Sitemap = PRODUCTS.map((product) => ({
+  const productEntries: MetadataRoute.Sitemap = products.map((product) => ({
     url: `${baseUrl}/produit/${product.slug}`,
     lastModified: now,
     changeFrequency: "weekly",

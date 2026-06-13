@@ -17,7 +17,13 @@ import {
 import Reveal from "@/components/motion/Reveal";
 import StaggerGroup, { StaggerItem } from "@/components/motion/StaggerGroup";
 import { createMetaEventId, trackMetaEvent } from "@/lib/meta-pixel";
-import { whatsappOrderLink } from "@/lib/utils";
+import {
+  FACEBOOK_URL,
+  INSTAGRAM_URL,
+  SUPPORT_PHONE_DISPLAY,
+  SUPPORT_PHONE_TEL,
+  whatsappOrderLink,
+} from "@/lib/utils";
 
 export default function ContactPage() {
   const [done, setDone] = useState(false);
@@ -110,7 +116,7 @@ export default function ContactPage() {
             <ContactCard
               icon={<MessageCircle size={20} />}
               title="WhatsApp"
-              value="+216 00 000 000"
+              value={SUPPORT_PHONE_DISPLAY}
               href={whatsappOrderLink()}
               cta="Discuter sur WhatsApp"
               onClick={() => trackContact("whatsapp-card")}
@@ -120,8 +126,8 @@ export default function ContactPage() {
             <ContactCard
               icon={<Phone size={20} />}
               title="Téléphone"
-              value="+216 00 000 000"
-              href="tel:+21600000000"
+              value={SUPPORT_PHONE_DISPLAY}
+              href={`tel:${SUPPORT_PHONE_TEL}`}
               cta="Appeler"
               onClick={() => trackContact("phone-card")}
             />
@@ -146,7 +152,7 @@ export default function ContactPage() {
             </div>
             <div className="mt-4 flex gap-2">
               <a
-                href="https://instagram.com"
+                href={INSTAGRAM_URL}
                 target="_blank"
                 rel="noopener"
                 aria-label="Instagram"
@@ -155,7 +161,7 @@ export default function ContactPage() {
                 <Instagram size={18} />
               </a>
               <a
-                href="https://facebook.com"
+                href={FACEBOOK_URL}
                 target="_blank"
                 rel="noopener"
                 aria-label="Facebook"

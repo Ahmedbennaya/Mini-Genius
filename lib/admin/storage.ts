@@ -456,12 +456,14 @@ export async function getSettings(): Promise<AdminSettings> {
   return readJsonFile<AdminSettings>(SETTINGS_FILE, {
     storeName: "Mini Genius",
     supportEmail: "support@minigenius.tn",
-    supportPhone: "+216 00 000 000",
+    supportPhone: "+216 52 338 194",
     currency: "TND",
     shippingStandardFee: 7,
     shippingExpressFee: 12,
     freeShippingThreshold: 250,
-    whatsappNumber: "21600000000",
+    whatsappNumber: "21652338194",
+    instagramUrl: "https://www.instagram.com/minigenius2036/",
+    facebookUrl: "https://www.facebook.com/MiniGeniusTunisie",
     maintenanceMode: false,
     updatedAt: new Date().toISOString(),
   });

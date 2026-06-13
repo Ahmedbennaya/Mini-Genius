@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { PackageX } from "lucide-react";
 import { AGES, CATEGORIES } from "@/data/site";
-import ProductCard from "@/components/product/ProductCard";
+import ProductCollectionGrid from "@/components/product/ProductCollectionGrid";
 import FilterSidebar from "@/components/product/FilterSidebar";
 import SearchTracker from "@/components/analytics/SearchTracker";
 import Reveal from "@/components/motion/Reveal";
@@ -12,11 +12,19 @@ import { listCollections, listProducts } from "@/lib/admin/storage";
 import type { AdminCollection } from "@/lib/admin/types";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Collection - Jouets educatifs",
+  title: "Collection — Jouets éducatifs Montessori, STEM & sensoriels",
   description:
-    "Parcourez toute la collection Mini Genius : jouets Montessori, STEM, sensoriels, puzzles, construction et coffrets cadeaux. Filtrez par age et categorie.",
+    "Parcourez toute la collection Mini Genius : jouets Montessori, STEM, sensoriels, puzzles, construction et coffrets cadeaux. Filtrez par âge et catégorie. Livraison partout en Tunisie.",
+  alternates: { canonical: "/collection" },
+  openGraph: {
+    type: "website",
+    title: "Collection — Jouets éducatifs Montessori, STEM & sensoriels",
+    description:
+      "Toute la collection Mini Genius : Montessori, STEM, sensoriels, puzzles, construction et coffrets cadeaux. Livraison partout en Tunisie.",
+  },
 };
 
 type SP = {
@@ -116,11 +124,7 @@ export default async function CollectionPage({ searchParams }: { searchParams: S
           {list.length === 0 ? (
             <EmptyState />
           ) : (
-            <div className="grid gap-7 sm:grid-cols-2">
-              {list.map((product, index) => (
-                <ProductCard key={product.id} product={product} index={index} />
-              ))}
-            </div>
+            <ProductCollectionGrid products={list} />
           )}
         </Reveal>
       </div>

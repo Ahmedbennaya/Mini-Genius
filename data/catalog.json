@@ -29,15 +29,17 @@
     "shape": "puzzle",
     "isNew": true,
     "inStock": true,
-    "image": "https://m.media-amazon.com/images/I/711vOG-eH4L._AC_SL1500_.jpg",
+    "image": "/images/age-3-5.jpg",
     "bestseller": false,
-    "image_url": "https://m.media-amazon.com/images/I/711vOG-eH4L._AC_SL1500_.jpg",
+    "image_url": "/images/age-3-5.jpg",
     "images": [
-      "https://m.media-amazon.com/images/I/711vOG-eH4L._AC_SL1500_.jpg"
+      "/images/age-3-5.jpg"
     ],
-    "imageFrameWidth": 1200,
-    "imageFrameHeight": 1600,
-    "imageFit": "cover"
+    "imageFrameWidth": 1080,
+    "imageFrameHeight": 1080,
+    "imageFit": "cover",
+    "imagePositionX": 50,
+    "imagePositionY": 55
   },
   {
     "id": "cubes-alphabet",
